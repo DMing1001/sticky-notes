@@ -77,19 +77,32 @@ function createTray() {
   });
 }
 
-app.whenReady().then(() => {
-  createWindow();
-  createTray();
-
-  // 注册全局快捷键 Ctrl+Shift+N 快速呼出
-  globalShortcut.register('CommandOrControl+Shift+N', () => {
+// ── 单实例锁定 ──
+const gotLock = app.requestSingleInstanceLock();
+if (!gotLock) {
+  app.quit();
+} else {
+  app.on('second-instance', () => {
     if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore();
       mainWindow.show();
       mainWindow.focus();
-      mainWindow.webContents.send('shortcut', 'new-note');
     }
   });
-});
+
+  app.whenReady().then(() => {
+    createWindow();
+    createTray();
+
+    globalShortcut.register('CommandOrControl+Shift+N', () => {
+      if (mainWindow) {
+        mainWindow.show();
+        mainWindow.focus();
+        mainWindow.webContents.send('shortcut', 'new-note');
+      }
+    });
+  });
+}
 
 app.on('window-all-closed', () => {
   // macOS 上通常不退出
