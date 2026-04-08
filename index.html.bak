@@ -64,7 +64,7 @@ body{
   background:linear-gradient(135deg,var(--accent),var(--accent2));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;
   background-clip:text;
-  display:flex;align-items:center;gap:5px;margin-right:4px;margin-left:4px;flex-shrink:0;
+  display:flex;align-items:center;gap:5px;margin-right:4px;flex-shrink:0;
 }
 .toolbar-brand svg{
   width:18px;height:18px;
@@ -570,36 +570,6 @@ body.light .warm-msg:hover{
 .warm-msg.warm-fade-in{
   animation:warmFadeIn .45s ease forwards;
 }
-
-/* ── Search Highlight ── */
-.search-hl{
-  background:rgba(255,200,0,.35);border-radius:2px;padding:0 1px;
-  color:inherit;
-}
-body.light .search-hl{background:rgba(255,180,0,.3)}
-
-/* ── Image Lightbox ── */
-.img-overlay{
-  position:fixed;top:0;left:0;right:0;bottom:0;
-  background:rgba(0,0,0,.75);backdrop-filter:blur(12px);
-  z-index:9999999;display:none;align-items:center;justify-content:center;
-  cursor:zoom-out;padding:40px;
-}
-.img-overlay.show{display:flex}
-.img-overlay img{
-  max-width:90vw;max-height:90vh;border-radius:12px;
-  box-shadow:0 20px 60px rgba(0,0,0,.5);object-fit:contain;
-}
-.img-overlay .img-close{
-  position:absolute;top:16px;right:20px;
-  width:36px;height:36px;border-radius:50%;
-  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);
-  color:#fff;font-size:20px;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  transition:background .2s;
-}
-.img-overlay .img-close:hover{background:rgba(255,255,255,.2)}
-
 </style>
 </head>
 <body>
@@ -643,10 +613,6 @@ body.light .search-hl{background:rgba(255,180,0,.3)}
   <button class="btn" id="btnExport" title="导出 JSON">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
   </button>
-  <input type="file" id="importInput" accept=".json" style="display:none"/>
-  <button class="btn" id="btnImport" title="导入 JSON">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-  </button>
   <div class="sep"></div>
   <button class="btn danger" id="btnClear" title="清空">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
@@ -688,7 +654,6 @@ body.light .search-hl{background:rgba(255,180,0,.3)}
     <div class="row"><span>重做</span><span><span class="key">Ctrl</span> + <span class="key">Y</span></span></div>
     <div class="row"><span>粘贴图片</span><span><span class="key">Ctrl</span> + <span class="key">V</span></span></div>
     <div class="row"><span>右键便笺</span><span>更多操作</span></div>
-    <div class="row"><span>点击图片</span><span>预览放大</span></div>
     <div style="text-align:center;margin-top:18px;font-size:12px;color:rgba(255,255,255,.22)">按 Esc 关闭</div>
   </div>
 </div>
@@ -1177,45 +1142,6 @@ function buildNote(n){
       if(e.key==='i'){e.preventDefault();document.execCommand('italic')}
       if(e.key==='u'){e.preventDefault();document.execCommand('underline')}
     }
-    // Markdown shortcuts (normal mode, on Enter)
-    if(!n.checklist && e.key==='Enter' && !e.shiftKey){
-      const sel=window.getSelection();
-      if(sel.rangeCount){
-        const range=sel.getRangeAt(0);
-        const node=sel.anchorNode;
-        if(node && node.nodeType===3){
-          const text=node.textContent;
-          const before=text.slice(0,sel.anchorOffset);
-          // Detect patterns at start of current line
-          const lineStart=before.lastIndexOf('\n')+1;
-          const line=before.slice(lineStart);
-          const patterns=[
-            {re:/^(#{1,6})\s$/,  mk:(m)=>{const tag='h'+m[1].length;return `<${tag}>`}},
-            {re:/^([-*])\s$/,    mk:()=>'<li>'},
-            {re:/^(\d+)\.\s$/, mk:()=>'<li>'},
-            {re:/^>\s$/,         mk:()=>'<blockquote>'},
-            {re:/^- \[ \]\s$/, mk:()=>'<div>☐ </div>'},
-            {re:/^- \[x\]\s$/i,mk:()=>'<div>☑ </div>'},
-          ];
-          for(const p of patterns){
-            const m=line.match(p.re);
-            if(m){
-              e.preventDefault();
-              snapshot();
-              // Remove the markdown syntax from current position
-              const newBefore=before.slice(0,lineStart);
-              node.textContent=newBefore+text.slice(sel.anchorOffset);
-              // Insert line break
-              document.execCommand('insertLineBreak');
-              n.content=bd.innerHTML;
-              save();
-              return;
-            }
-          }
-        }
-      }
-    }
-
     // checklist: Enter to add new item, Backspace on empty to remove
     if(n.checklist){
       if(e.key==='Enter'&&!e.shiftKey){
@@ -1289,11 +1215,10 @@ function buildNote(n){
         save();
       }
     }
-    // image preview → lightbox
+    // image preview (simple: click to toggle size)
     const img=e.target.closest('img');
     if(img){
-      document.getElementById('imgPreview').src=img.src;
-      document.getElementById('imgOverlay').classList.add('show');
+      img.style.maxWidth=img.style.maxWidth==='100%'?'none':'100%';
     }
   });
 
@@ -1595,8 +1520,6 @@ searchInput.addEventListener('input',()=>{
     let text=(n.title||'')+' '+(n.checklist?(n.checks||[]).map(c=>c.text).join(' '):stripHtml(n.content||''));
     el.classList.toggle('hidden-search',q&&!text.toLowerCase().includes(q));
   });
-  // Apply highlight after filter
-  setTimeout(highlightSearch,10);
 });
 
 /* ── Clear ── */
@@ -1674,9 +1597,8 @@ canvas.addEventListener('dblclick',e=>{if(!e.target.closest('.note'))newNote()})
 document.addEventListener('keydown',e=>{
   if((e.ctrlKey||e.metaKey)&&e.key==='n'){e.preventDefault();newNote()}
   if((e.ctrlKey||e.metaKey)&&e.key==='z'&&!e.target.closest('[contenteditable]')){e.preventDefault();undo()}
-  if((e.ctrlKey||e.metaKey)&&(e.key==='y'||(e.ctrlKey&&e.shiftKey&&e.key==='Z')||(e.metaKey&&e.shiftKey&&e.key==='z'))&&!e.target.closest('[contenteditable]')){e.preventDefault();redo()}
+  if((e.ctrlKey||e.metaKey)&&(e.key==='y'||(e.shiftKey&&e.key==='Z'))&&!e.target.closest('[contenteditable]')){e.preventDefault();redo()}
   if(e.key==='Escape'){
-    if(imgOverlay.classList.contains('show')){imgOverlay.classList.remove('show');return}
     if(shortcutsOverlay.classList.contains('show')){shortcutsOverlay.classList.remove('show');return}
     if(searchInput.value){searchInput.value='';searchInput.dispatchEvent(new Event('input'));searchInput.blur();return}
     ctxMenu.classList.remove('show');closeAllPopups();
@@ -1705,12 +1627,5 @@ if(window.electronAPI){
   });
 }
 </script>
-
-<!-- Image Lightbox -->
-<div class="img-overlay" id="imgOverlay">
-  <div class="img-close" id="imgClose">✕</div>
-  <img id="imgPreview" src="" alt="preview"/>
-</div>
-
 </body>
 </html>
