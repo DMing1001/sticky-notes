@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>便笺</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#0c0c18;
+  --text:#eaeaf6;
+  --dim:#6a6a8e;
+  --accent:#8b5cf6;
+  --accent2:#6d9fff;
+  --danger:#f43f6b;
+  --glass:rgba(18,18,38,.72);
+  --glass-border:rgba(255,255,255,.06);
+  --radius:12px;
+  --shadow:0 8px 32px rgba(0,0,0,.55);
+}
+
+/* ── Light Mode ── */
+body.light{
+  --bg:#f0eff4;
+  --text:#1a1a2e;
+  --dim:#8888a0;
+  --accent:#7c3aed;
+  --accent2:#3b82f6;
+  --danger:#e11d48;
+  --glass:rgba(240,239,244,.82);
+  --glass-border:rgba(0,0,0,.06);
+  --shadow:0 4px 20px rgba(0,0,0,.08);
+}
+
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;
+  background:var(--bg);color:var(--text);
+  height:100vh;overflow:hidden;user-select:none;
+  transition:background .35s ease,color .35s ease;
+}
+
+/* ═══════════════ Toolbar ═══════════════ */
+.toolbar{
+  position:fixed;top:0;left:0;right:0;height:52px;
+  background:var(--glass);
+  backdrop-filter:blur(24px) saturate(1.4);
+  -webkit-backdrop-filter:blur(24px) saturate(1.4);
+  border-bottom:1px solid var(--glass-border);
+  display:flex;align-items:center;padding:0 16px;gap:8px;z-index:9999;
+  transition:background .35s ease,border-color .35s ease;
+}
+.toolbar-brand{
+  font-size:16px;font-weight:800;letter-spacing:.4px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+  display:flex;align-items:center;gap:8px;margin-right:4px;
+}
+.toolbar-brand svg{
+  width:22px;height:22px;
+  stroke:var(--accent);fill:none;stroke-width:2;
+  -webkit-text-fill-color:unset;
+}
+.badge{
+  font-size:11px;font-weight:600;color:var(--accent);
+  padding:3px 10px;border-radius:20px;
+  background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.15);
+  margin-right:10px;white-space:nowrap;
+}
+
+/* search */
+.search-box{position:relative;margin-right:auto}
+.search-box input{
+  width:220px;height:34px;border-radius:17px;
+  border:1px solid rgba(255,255,255,.06);
+  background:rgba(255,255,255,.03);color:var(--text);
+  font-size:13px;padding:0 12px 0 34px;outline:none;
+  transition:all .3s ease;
+}
+.search-box input:focus{
+  border-color:rgba(139,92,246,.35);width:280px;
+  background:rgba(255,255,255,.06);
+  box-shadow:0 0 0 3px rgba(139,92,246,.08);
+}
+.search-box input::placeholder{color:var(--dim);font-weight:400}
+.search-box svg{
+  position:absolute;left:11px;top:50%;transform:translateY(-50%);
+  width:15px;height:15px;color:var(--dim);pointer-events:none;
+}
+
+/* buttons */
+.btn{
+  display:inline-flex;align-items:center;gap:5px;
+  height:32px;padding:0 14px;border-radius:16px;
+  border:1px solid rgba(255,255,255,.07);
+  background:rgba(255,255,255,.03);color:var(--text);
+  font-size:12px;font-weight:500;cursor:pointer;
+  transition:all .25s ease;white-space:nowrap;
+}
+.btn:hover{
+  background:rgba(139,92,246,.18);border-color:rgba(139,92,246,.3);
+  color:#fff;transform:translateY(-1px);
+  box-shadow:0 4px 12px rgba(139,92,246,.15);
+}
+.btn:active{transform:translateY(0)}
+.btn.danger:hover{
+  background:rgba(244,63,107,.15);border-color:rgba(244,63,107,.3);
+  box-shadow:0 4px 12px rgba(244,63,107,.12);color:var(--danger);
+}
+.btn svg{width:15px;height:15px;flex-shrink:0}
+.sep{width:1px;height:20px;background:rgba(255,255,255,.06);margin:0 2px}
+
+/* ═══════════════ Canvas ═══════════════ */
+.canvas{
+  position:fixed;top:52px;left:0;right:0;bottom:0;overflow:auto;
+  background-color:var(--bg);
+  background-image:
+    radial-gradient(ellipse 600px 400px at 20% 30%,rgba(139,92,246,.04) 0%,transparent 70%),
+    radial-gradient(ellipse 500px 500px at 80% 70%,rgba(109,159,255,.03) 0%,transparent 70%),
+    linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);
+  background-size:100% 100%,100% 100%,20px 20px,20px 20px;
+}
+body.light .canvas{
+  background-image:
+    radial-gradient(ellipse 600px 400px at 20% 30%,rgba(139,92,246,.03) 0%,transparent 70%),
+    radial-gradient(ellipse 500px 500px at 80% 70%,rgba(59,130,246,.02) 0%,transparent 70%),
+    linear-gradient(rgba(0,0,0,.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,0,0,.03) 1px,transparent 1px);
+}
+
+/* ═══════════════ Note Card ═══════════════ */
+.note{
+  position:absolute;width:280px;min-width:200px;min-height:180px;
+  border-radius:var(--radius);
+  border:1.5px solid var(--c-border);
+  background:var(--c-bg);
+  box-shadow:var(--shadow);display:flex;flex-direction:column;
+  overflow:hidden;transition:box-shadow .25s,border-color .25s,transform .15s;
+}
+.note:hover{box-shadow:0 12px 44px rgba(0,0,0,.6);border-color:var(--c-accent)}
+.note.dragging{
+  opacity:.92;z-index:10000!important;cursor:grabbing;
+  box-shadow:0 20px 60px rgba(0,0,0,.7);transform:scale(1.03);
+}
+.note.collapsed .note-bd,.note.collapsed .note-meta{display:none}
+.note.collapsed .rz{display:none}
+.note.pinned{border-width:2px;box-shadow:0 8px 32px rgba(0,0,0,.5),0 0 0 1px var(--c-accent)}
+.note.pinned::after{
+  content:'📌';position:absolute;top:-2px;left:6px;font-size:12px;z-index:2;
+  filter:drop-shadow(0 1px 2px rgba(0,0,0,.5));
+}
+.note.hidden-search{display:none}
+
+/* ── Color Themes — vivid & saturated ── */
+.note[data-color="amber"]{
+  --c-bg:linear-gradient(145deg,#2e2508,#382e0a);
+  --c-border:rgba(255,200,50,.32);--c-dot:#ffc832;--c-accent:#ffc832;
+  background:var(--c-bg);
+}
+.note[data-color="rose"]{
+  --c-bg:linear-gradient(145deg,#2e0c18,#38101e);
+  --c-border:rgba(255,100,130,.3);--c-dot:#ff6e8a;--c-accent:#ff6e8a;
+  background:var(--c-bg);
+}
+.note[data-color="azure"]{
+  --c-bg:linear-gradient(145deg,#0c1e2e,#102838);
+  --c-border:rgba(80,180,255,.3);--c-dot:#50b4ff;--c-accent:#50b4ff;
+  background:var(--c-bg);
+}
+.note[data-color="jade"]{
+  --c-bg:linear-gradient(145deg,#0c2e16,#10381c);
+  --c-border:rgba(80,220,120,.3);--c-dot:#50dc78;--c-accent:#50dc78;
+  background:var(--c-bg);
+}
+.note[data-color="iris"]{
+  --c-bg:linear-gradient(145deg,#1e0c2e,#281038);
+  --c-border:rgba(170,100,255,.3);--c-dot:#aa64ff;--c-accent:#aa64ff;
+  background:var(--c-bg);
+}
+.note[data-color="graphite"]{
+  --c-bg:linear-gradient(145deg,#1e1e2e,#26263a);
+  --c-border:rgba(140,140,180,.25);--c-dot:#9898b8;--c-accent:#9898b8;
+  background:var(--c-bg);
+}
+.note[data-color="tangerine"]{
+  --c-bg:linear-gradient(145deg,#2e1a08,#38200a);
+  --c-border:rgba(255,150,50,.32);--c-dot:#ff9632;--c-accent:#ff9632;
+  background:var(--c-bg);
+}
+.note[data-color="teal"]{
+  --c-bg:linear-gradient(145deg,#0c2a2e,#103438);
+  --c-border:rgba(50,210,220,.3);--c-dot:#32d2dc;--c-accent:#32d2dc;
+  background:var(--c-bg);
+}
+
+/* ── Light Mode Note Colors ── */
+body.light .note[data-color="amber"]{
+  --c-bg:linear-gradient(145deg,#fff8e1,#fff3c4);
+  --c-border:rgba(245,180,20,.35);--c-dot:#f5b414;--c-accent:#f5b414;
+  background:var(--c-bg);
+}
+body.light .note[data-color="rose"]{
+  --c-bg:linear-gradient(145deg,#fff0f3,#ffe4e8);
+  --c-border:rgba(244,63,94,.25);--c-dot:#f43f5e;--c-accent:#f43f5e;
+  background:var(--c-bg);
+}
+body.light .note[data-color="azure"]{
+  --c-bg:linear-gradient(145deg,#eff6ff,#dbeafe);
+  --c-border:rgba(59,130,246,.25);--c-dot:#3b82f6;--c-accent:#3b82f6;
+  background:var(--c-bg);
+}
+body.light .note[data-color="jade"]{
+  --c-bg:linear-gradient(145deg,#f0fdf4,#dcfce7);
+  --c-border:rgba(34,197,94,.25);--c-dot:#22c55e;--c-accent:#22c55e;
+  background:var(--c-bg);
+}
+body.light .note[data-color="iris"]{
+  --c-bg:linear-gradient(145deg,#f5f3ff,#ede9fe);
+  --c-border:rgba(139,92,246,.25);--c-dot:#8b5cf6;--c-accent:#8b5cf6;
+  background:var(--c-bg);
+}
+body.light .note[data-color="graphite"]{
+  --c-bg:linear-gradient(145deg,#f8fafc,#f1f5f9);
+  --c-border:rgba(148,163,184,.3);--c-dot:#94a3b8;--c-accent:#94a3b8;
+  background:var(--c-bg);
+}
+body.light .note[data-color="tangerine"]{
+  --c-bg:linear-gradient(145deg,#fff7ed,#ffedd5);
+  --c-border:rgba(249,115,22,.25);--c-dot:#f97316;--c-accent:#f97316;
+  background:var(--c-bg);
+}
+body.light .note[data-color="teal"]{
+  --c-bg:linear-gradient(145deg,#f0fdfa,#ccfbf1);
+  --c-border:rgba(20,184,166,.25);--c-dot:#14b8a6;--c-accent:#14b8a6;
+  background:var(--c-bg);
+}
+
+/* light mode overrides */
+body.light .note-title{color:#1a1a2e}
+body.light .note-bd{color:rgba(0,0,0,.78)}
+body.light .note-bd:empty::before{color:rgba(0,0,0,.2)}
+body.light .note-bd b,.note-bd strong{color:#000}
+body.light .note-meta{color:rgba(0,0,0,.25)}
+body.light .rz::after{border-color:rgba(0,0,0,.15)}
+body.light .empty svg{color:var(--accent)}
+body.light .empty p{color:rgba(0,0,0,.25)}
+body.light .empty .hint{color:rgba(0,0,0,.15)}
+body.light .nbtn{color:#aaa}
+body.light .nbtn:hover{color:#333;background:rgba(0,0,0,.06)}
+body.light .nbtn.del:hover{color:var(--danger);background:rgba(225,29,72,.08)}
+body.light .note:hover{box-shadow:0 8px 32px rgba(0,0,0,.1);border-color:var(--c-accent)}
+body.light .note.dragging{box-shadow:0 16px 48px rgba(0,0,0,.15)}
+body.light .cp-popup{background:rgba(255,255,255,.95);border-color:rgba(0,0,0,.08);box-shadow:0 8px 28px rgba(0,0,0,.12)}
+body.light .ctx{background:rgba(255,255,255,.95);border-color:rgba(0,0,0,.06);box-shadow:0 8px 28px rgba(0,0,0,.1)}
+body.light .ctx-item{color:#333}
+body.light .ctx-item:hover{background:rgba(0,0,0,.05)}
+body.light .ctx-sep{background:rgba(0,0,0,.06)}
+
+/* header */
+.note-hd{
+  display:flex;align-items:center;padding:10px 10px;cursor:grab;gap:6px;flex-shrink:0;
+}
+.note.dragging .note-hd{cursor:grabbing}
+.note-title{
+  flex:1;font-size:14px;font-weight:700;color:#f4f4ff;
+  background:none;border:none;outline:none;cursor:text;user-select:text;
+  min-width:0;letter-spacing:.2px;
+}
+.note-title::placeholder{color:rgba(255,255,255,.2);font-weight:500}
+.note-meta{
+  font-size:10px;color:rgba(255,255,255,.18);padding:0 12px 6px;flex-shrink:0;
+  font-weight:500;letter-spacing:.3px;
+}
+.note-btns{display:flex;gap:2px;opacity:0;transition:opacity .2s}
+.note:hover .note-btns{opacity:1}
+.nbtn{
+  width:26px;height:26px;border:none;background:transparent;color:var(--dim);
+  cursor:pointer;border-radius:8px;display:flex;align-items:center;justify-content:center;
+  transition:all .18s;
+}
+.nbtn:hover{background:rgba(255,255,255,.1);color:var(--text)}
+.nbtn.del:hover{color:var(--danger);background:rgba(244,63,107,.1)}
+.nbtn.pin-active{color:var(--c-accent);opacity:1}
+.nbtn svg{width:14px;height:14px}
+
+/* color picker */
+.cp-popup{
+  position:absolute;top:42px;right:10px;
+  background:rgba(20,20,40,.95);backdrop-filter:blur(16px);
+  border:1px solid rgba(255,255,255,.08);border-radius:12px;
+  padding:10px;display:none;gap:7px;flex-wrap:wrap;width:120px;
+  box-shadow:0 12px 36px rgba(0,0,0,.65);z-index:100;
+}
+.cp-popup.show{display:flex}
+.cdot{
+  width:24px;height:24px;border-radius:7px;border:2px solid transparent;
+  cursor:pointer;transition:all .18s;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);
+}
+.cdot:hover{transform:scale(1.2);box-shadow:0 0 8px var(--cdot-color,inset 0 0 0 1px rgba(0,0,0,.15))}
+.cdot.on{border-color:#fff;transform:scale(1.1)}
+.cdot[data-c="amber"]{background:#ffc832}
+.cdot[data-c="rose"]{background:#ff6e8a}
+.cdot[data-c="azure"]{background:#50b4ff}
+.cdot[data-c="jade"]{background:#50dc78}
+.cdot[data-c="iris"]{background:#aa64ff}
+.cdot[data-c="graphite"]{background:#9898b8}
+.cdot[data-c="tangerine"]{background:#ff9632}
+.cdot[data-c="teal"]{background:#32d2dc}
+
+/* content */
+.note-bd{
+  flex:1;padding:2px 14px 10px;font-size:15px;line-height:1.72;
+  color:rgba(255,255,255,.85);outline:none;cursor:text;user-select:text;
+  overflow-y:auto;white-space:pre-wrap;word-break:break-word;
+}
+.note-bd:empty::before{content:'写点什么…';color:rgba(255,255,255,.18)}
+.note-bd b,.note-bd strong{color:#fff}
+
+/* resize */
+.rz{
+  position:absolute;bottom:0;right:0;width:18px;height:18px;
+  cursor:nwse-resize;opacity:0;transition:opacity .18s;
+}
+.note:hover .rz{opacity:.3}
+.rz::after{
+  content:'';position:absolute;bottom:5px;right:5px;
+  width:7px;height:7px;
+  border-right:2px solid rgba(255,255,255,.2);border-bottom:2px solid rgba(255,255,255,.2);
+}
+
+/* ═══════════════ Empty ═══════════════ */
+.empty{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  text-align:center;pointer-events:none;
+}
+.empty svg{width:64px;height:64px;opacity:.12;margin-bottom:14px;color:var(--accent)}
+.empty p{font-size:17px;color:rgba(255,255,255,.2);font-weight:500}
+.empty .hint{font-size:13px;margin-top:8px;color:rgba(255,255,255,.12);font-weight:400}
+
+/* ═══════════════ Context Menu ═══════════════ */
+.ctx{
+  position:fixed;
+  background:rgba(20,20,42,.92);backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,.07);border-radius:12px;
+  padding:5px;min-width:170px;
+  box-shadow:0 12px 36px rgba(0,0,0,.6);z-index:99999;display:none;
+}
+.ctx.show{display:block}
+.ctx-item{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 12px;border-radius:8px;font-size:13px;font-weight:500;
+  color:rgba(255,255,255,.75);cursor:pointer;transition:all .12s;
+}
+.ctx-item:hover{background:rgba(255,255,255,.07);color:#fff}
+.ctx-item svg{width:14px;height:14px;color:var(--dim);flex-shrink:0}
+.ctx-item.danger{color:var(--danger)}
+.ctx-item.danger svg{color:var(--danger)}
+.ctx-item.danger:hover{background:rgba(244,63,107,.1)}
+.ctx-sep{height:1px;background:rgba(255,255,255,.05);margin:4px 8px}
+
+/* ═══════════════ Animations ═══════════════ */
+@keyframes popIn{from{opacity:0;transform:scale(.9) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.note.entering{animation:popIn .25s cubic-bezier(.22,1,.36,1)}
+@keyframes popOut{from{opacity:1;transform:scale(1)}to{opacity:0;transform:scale(.82) translateY(8px)}}
+.note.removing{animation:popOut .18s ease-in forwards;pointer-events:none}
+
+/* ═══════════════ Shortcuts Help ═══════════════ */
+.shortcuts-overlay{
+  position:fixed;top:0;left:0;right:0;bottom:0;
+  background:rgba(0,0,0,.5);backdrop-filter:blur(6px);
+  z-index:999999;display:none;align-items:center;justify-content:center;
+}
+.shortcuts-overlay.show{display:flex}
+.shortcuts-panel{
+  background:rgba(20,20,42,.95);backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,.08);border-radius:16px;
+  padding:28px 32px;min-width:360px;max-width:420px;
+  box-shadow:0 20px 60px rgba(0,0,0,.5);
+}
+.shortcuts-panel h3{
+  font-size:16px;font-weight:700;color:var(--accent);margin-bottom:18px;
+  display:flex;align-items:center;gap:8px;
+}
+.shortcuts-panel .row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:6px 0;font-size:13px;
+}
+.shortcuts-panel .row span{color:rgba(255,255,255,.6)}
+.shortcuts-panel .key{
+  display:inline-block;padding:2px 8px;border-radius:5px;
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);
+  font-family:monospace;font-size:12px;color:rgba(255,255,255,.8);
+  min-width:28px;text-align:center;
+}
+body.light .shortcuts-panel{
+  background:rgba(255,255,255,.96);border-color:rgba(0,0,0,.06);
+  box-shadow:0 20px 60px rgba(0,0,0,.15);
+}
+body.light .shortcuts-panel h3{color:var(--accent)}
+body.light .shortcuts-panel .row span{color:#555}
+body.light .shortcuts-panel .key{
+  background:rgba(0,0,0,.05);border-color:rgba(0,0,0,.08);color:#333;
+}
+
+/* scrollbar */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.05);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.1)}
+</style>
+</head>
+<body>
+
+<!-- Toolbar -->
+<div class="toolbar">
+  <div class="toolbar-brand">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15.5 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.5L15.5 3Z"/><polyline points="14 3 14 8 21 8"/></svg>
+    便笺
+  </div>
+  <span class="badge" id="cnt">0 张</span>
+  <div class="search-box">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input id="searchInput" placeholder="搜索便笺…" spellcheck="false"/>
+  </div>
+  <button class="btn" id="btnNew" title="Ctrl+N">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    新建
+  </button>
+  <button class="btn" id="btnArrange" title="自动排列">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+    排列
+  </button>
+  <button class="btn" id="btnTheme" title="切换主题">
+    <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+  <button class="btn" id="btnHelp" title="快捷键 (?)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+  </button>
+  <button class="btn" id="btnExport" title="导出 JSON">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    导出
+  </button>
+  <div class="sep"></div>
+  <button class="btn danger" id="btnClear">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+    清空
+  </button>
+</div>
+
+<!-- Canvas -->
+<div class="canvas" id="canvas">
+  <div class="empty" id="empty">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15.5 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.5L15.5 3Z"/><polyline points="14 3 14 8 21 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
+    <p>还没有便笺</p>
+    <p class="hint">按 Ctrl+N 或点击「新建」开始</p>
+  </div>
+</div>
+
+<!-- Context Menu -->
+<div class="ctx" id="ctxMenu">
+  <div class="ctx-item" data-act="pin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 17v5"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg>置顶</div>
+  <div class="ctx-item" data-act="collapse"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" y1="10" x2="21" y2="3"/><line x1="3" y1="21" x2="10" y2="14"/></svg>折叠/展开</div>
+  <div class="ctx-item" data-act="duplicate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>复制</div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-item danger" data-act="delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>删除</div>
+</div>
+
+<!-- Shortcuts Overlay -->
+<div class="shortcuts-overlay" id="shortcutsOverlay">
+  <div class="shortcuts-panel">
+    <h3>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="6" y1="8" x2="6.01" y2="8"/><line x1="10" y1="8" x2="10.01" y2="8"/><line x1="14" y1="8" x2="14.01" y2="8"/><line x1="18" y1="8" x2="18.01" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="6" y1="16" x2="18" y2="16"/></svg>
+      快捷键
+    </h3>
+    <div class="row"><span>新建便笺</span><span><span class="key">Ctrl</span> + <span class="key">N</span></span></div>
+    <div class="row"><span>双击空白区域</span><span>新建便笺</span></div>
+    <div class="row"><span>加粗</span><span><span class="key">Ctrl</span> + <span class="key">B</span></span></div>
+    <div class="row"><span>斜体</span><span><span class="key">Ctrl</span> + <span class="key">I</span></span></div>
+    <div class="row"><span>下划线</span><span><span class="key">Ctrl</span> + <span class="key">U</span></span></div>
+    <div class="row"><span>关闭弹窗 / 清搜索</span><span><span class="key">Esc</span></span></div>
+    <div class="row"><span>右键便笺</span><span>更多操作</span></div>
+    <div style="text-align:center;margin-top:16px;font-size:12px;color:rgba(255,255,255,.25)">按 Esc 或点击关闭</div>
+  </div>
+</div>
+
+<script>
+const COLORS=['amber','rose','azure','jade','iris','graphite','tangerine','teal'];
+const KEY='sticky-notes-v2';
+const GRID=20;
+
+let notes=JSON.parse(localStorage.getItem(KEY)||'[]');
+// migrate old color names
+const colorMap={yellow:'amber',coral:'rose',sky:'azure',mint:'jade',violet:'iris',slate:'graphite',peach:'tangerine',ocean:'teal',pink:'rose',blue:'azure',green:'jade',purple:'iris',gray:'graphite'};
+notes=notes.map(n=>({...n,color:colorMap[n.color]||n.color}));
+
+let maxZ=notes.reduce((m,n)=>Math.max(m,n.z||10),10);
+let ctxNoteId=null;
+
+const canvas=document.getElementById('canvas');
+const emptyEl=document.getElementById('empty');
+const cntEl=document.getElementById('cnt');
+const ctxMenu=document.getElementById('ctxMenu');
+const searchInput=document.getElementById('searchInput');
+const shortcutsOverlay=document.getElementById('shortcutsOverlay');
+
+/* ── Theme ── */
+let theme=localStorage.getItem('sticky-theme')||'dark';
+function applyTheme(){
+  document.body.classList.toggle('light',theme==='light');
+  const icon=document.getElementById('themeIcon');
+  icon.innerHTML=theme==='light'
+    ?`<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>`
+    :`<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>`;
+}
+applyTheme();
+document.getElementById('btnTheme').addEventListener('click',()=>{
+  theme=theme==='dark'?'light':'dark';
+  localStorage.setItem('sticky-theme',theme);
+  applyTheme();
+});
+
+/* ── Shortcuts Help ── */
+document.getElementById('btnHelp').addEventListener('click',()=>{
+  shortcutsOverlay.classList.add('show');
+});
+shortcutsOverlay.addEventListener('click',e=>{
+  if(e.target===shortcutsOverlay)shortcutsOverlay.classList.remove('show');
+});
+
+/* ── Save ── */
+let saveT;
+function save(){clearTimeout(saveT);saveT=setTimeout(()=>localStorage.setItem(KEY,JSON.stringify(notes)),200)}
+function updCnt(){
+  const visible=notes.length;
+  const pinned=notes.filter(n=>n.pinned).length;
+  cntEl.textContent=visible+' 张'+(pinned?` · ${pinned} 置顶`:'');
+}
+
+/* ── Format time ── */
+function fmtTime(ts){
+  if(!ts)return'';
+  const d=new Date(ts);
+  const now=new Date();
+  const pad=n=>String(n).padStart(2,'0');
+  const time=pad(d.getHours())+':'+pad(d.getMinutes());
+  if(d.toDateString()===now.toDateString())return'今天 '+time;
+  const y=new Date(now);y.setDate(y.getDate()-1);
+  if(d.toDateString()===y.toDateString())return'昨天 '+time;
+  return`${d.getMonth()+1}/${d.getDate()} ${time}`;
+}
+
+/* ── Render All ── */
+function renderAll(){
+  canvas.querySelectorAll('.note').forEach(e=>e.remove());
+  // pinned first, then by z
+  const sorted=[...notes].sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0)||(b.z||0)-(a.z||0));
+  sorted.forEach(n=>buildEl(n));
+  emptyEl.style.display=notes.length?'none':'block';
+  updCnt();
+}
+
+/* ── Escape ── */
+function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML}
+
+/* ── Build Note Element ── */
+function buildEl(n){
+  const el=document.createElement('div');
+  el.className='note entering'+(n.pinned?' pinned':'')+(n.collapsed?' collapsed':'');
+  el.dataset.id=n.id;el.dataset.color=n.color||'amber';
+  el.style.cssText=`left:${n.x}px;top:${n.y}px;width:${n.w||280}px;min-height:${n.h||180}px;z-index:${n.z||++maxZ}`;
+
+  const pinIcon=n.pinned
+    ?`<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><path d="M12 17v5"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg>`
+    :`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 17v5"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg>`;
+
+  const foldIcon=n.collapsed
+    ?`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>`
+    :`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>`;
+
+  el.innerHTML=`
+    <div class="note-hd">
+      <input class="note-title" value="${esc(n.title||'')}" placeholder="标题" spellcheck="false"/>
+      <div class="cp-popup" id="cp-${n.id}">
+        ${COLORS.map(c=>`<div class="cdot${c===n.color?' on':''}" data-c="${c}"></div>`).join('')}
+      </div>
+      <div class="note-btns">
+        <button class="nbtn pin-btn${n.pinned?' pin-active':''}" title="${n.pinned?'取消置顶':'置顶'}">${pinIcon}</button>
+        <button class="nbtn cp-btn" title="颜色"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg></button>
+        <button class="nbtn fold-btn" title="${n.collapse?'展开':'折叠'}">${foldIcon}</button>
+        <button class="nbtn del" title="删除"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div>
+    </div>
+    <div class="note-bd" contenteditable="true">${esc(n.content||'')}</div>
+    <div class="note-meta">${fmtTime(n.created)}</div>
+    <div class="rz"></div>`;
+
+  canvas.appendChild(el);
+  setTimeout(()=>el.classList.remove('entering'),220);
+
+  /* refs */
+  const hd=el.querySelector('.note-hd');
+  const titleEl=el.querySelector('.note-title');
+  const bd=el.querySelector('.note-bd');
+  const cpPopup=el.querySelector('.cp-popup');
+  const rz=el.querySelector('.rz');
+  const pinBtn=el.querySelector('.pin-btn');
+  const foldBtn=el.querySelector('.fold-btn');
+
+  /* focus / z */
+  el.addEventListener('mousedown',()=>{if(!n.pinned){n.z=++maxZ;el.style.zIndex=n.z}save()});
+
+  /* title */
+  titleEl.addEventListener('input',()=>{n.title=titleEl.value;save()});
+
+  /* content */
+  bd.addEventListener('input',()=>{n.content=bd.innerHTML;save()});
+
+  /* keyboard shortcuts in content */
+  bd.addEventListener('keydown',e=>{
+    if(e.ctrlKey||e.metaKey){
+      if(e.key==='b'){e.preventDefault();document.execCommand('bold')}
+      if(e.key==='i'){e.preventDefault();document.execCommand('italic')}
+      if(e.key==='u'){e.preventDefault();document.execCommand('underline')}
+    }
+  });
+
+  /* color picker */
+  el.querySelector('.cp-btn').addEventListener('click',e=>{
+    e.stopPropagation();
+    document.querySelectorAll('.cp-popup.show').forEach(p=>p.classList.remove('show'));
+    cpPopup.classList.toggle('show');
+  });
+  cpPopup.querySelectorAll('.cdot').forEach(dot=>{
+    dot.addEventListener('click',e=>{
+      e.stopPropagation();
+      const c=dot.dataset.c;n.color=c;el.dataset.color=c;
+      cpPopup.querySelectorAll('.cdot').forEach(d=>d.classList.remove('on'));
+      dot.classList.add('on');cpPopup.classList.remove('show');save();
+    });
+  });
+
+  /* pin */
+  pinBtn.addEventListener('click',e=>{
+    e.stopPropagation();
+    n.pinned=!n.pinned;
+    el.classList.toggle('pinned',n.pinned);
+    pinBtn.classList.toggle('pin-active',n.pinned);
+    pinBtn.title=n.pinned?'取消置顶':'置顶';
+    pinBtn.innerHTML=n.pinned
+      ?`<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><path d="M12 17v5"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg>`
+      :`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 17v5"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg>`;
+    if(n.pinned){n.z=++maxZ;el.style.zIndex=n.z}
+    save();updCnt();
+  });
+
+  /* fold */
+  foldBtn.addEventListener('click',e=>{
+    e.stopPropagation();
+    n.collapsed=!n.collapsed;
+    el.classList.toggle('collapsed',n.collapsed);
+    foldBtn.innerHTML=n.collapsed
+      ?`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>`
+      :`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>`;
+    foldBtn.title=n.collapsed?'展开':'折叠';
+    save();
+  });
+
+  /* delete */
+  el.querySelector('.del').addEventListener('click',e=>{
+    e.stopPropagation();deleteNote(n.id);
+  });
+
+  /* context menu */
+  el.addEventListener('contextmenu',e=>{
+    e.preventDefault();e.stopPropagation();
+    ctxNoteId=n.id;
+    ctxMenu.style.left=e.clientX+'px';
+    ctxMenu.style.top=e.clientY+'px';
+    ctxMenu.classList.add('show');
+  });
+
+  /* ── Drag ── */
+  let drag=false,ox,oy;
+  hd.addEventListener('mousedown',e=>{
+    if(e.target.closest('.nbtn,.cdot,.cp-popup,.note-title'))return;
+    drag=true;el.classList.add('dragging');
+    const r=el.getBoundingClientRect();
+    ox=e.clientX-r.left;oy=e.clientY-r.top;
+    n.z=++maxZ;el.style.zIndex=n.z;e.preventDefault();
+  });
+
+  /* ── Resize ── */
+  let rsz=false,rw,rh,rmx,rmy;
+  rz.addEventListener('mousedown',e=>{
+    rsz=true;rw=el.offsetWidth;rh=el.offsetHeight;
+    rmx=e.clientX;rmy=e.clientY;e.preventDefault();e.stopPropagation();
+  });
+
+  const mv=e=>{
+    if(drag){
+      let x=e.clientX-ox,y=e.clientY-oy-52;
+      // snap to grid
+      x=Math.round(x/GRID)*GRID;
+      y=Math.round(y/GRID)*GRID;
+      // bounds: keep at least 60px visible
+      const maxX=canvas.scrollWidth-60;
+      const maxY=canvas.scrollHeight-60;
+      n.x=Math.max(-el.offsetWidth+60,Math.min(x,maxX));
+      n.y=Math.max(-el.offsetHeight+60,Math.min(y,maxY));
+      el.style.left=n.x+'px';el.style.top=n.y+'px';
+    }
+    if(rsz){
+      let w=Math.max(200,rw+e.clientX-rmx);
+      let h=Math.max(180,rh+e.clientY-rmy);
+      w=Math.round(w/GRID)*GRID;h=Math.round(h/GRID)*GRID;
+      n.w=w;n.h=h;
+      el.style.width=w+'px';el.style.minHeight=h+'px';
+    }
+  };
+  const up=()=>{
+    if(drag){drag=false;el.classList.remove('dragging');save()}
+    if(rsz){rsz=false;save()}
+  };
+  document.addEventListener('mousemove',mv);
+  document.addEventListener('mouseup',up);
+}
+
+/* ── Delete ── */
+function deleteNote(id){
+  const el=canvas.querySelector(`[data-id="${id}"]`);
+  if(el){
+    el.classList.add('removing');
+    setTimeout(()=>{
+      notes=notes.filter(x=>x.id!==id);
+      el.remove();emptyEl.style.display=notes.length?'none':'block';updCnt();save();
+    },160);
+  }
+}
+
+/* ── Duplicate ── */
+function duplicateNote(id){
+  const src=notes.find(n=>n.id===id);
+  if(!src)return;
+  const id2=Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+  const n={...src,id:id2,x:src.x+30,y:src.y+30,z:++maxZ,created:Date.now(),pinned:false};
+  notes.push(n);buildEl(n);emptyEl.style.display='none';updCnt();save();
+}
+
+/* ── New Note ── */
+function newNote(){
+  const id=Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+  const x=Math.round((40+Math.random()*120+canvas.scrollLeft)/GRID)*GRID;
+  const y=Math.round((20+Math.random()*60+canvas.scrollTop)/GRID)*GRID;
+  const n={
+    id,title:'',content:'',
+    color:COLORS[Math.floor(Math.random()*COLORS.length)],
+    x,y,w:280,h:200,z:++maxZ,created:Date.now(),pinned:false,collapsed:false,
+  };
+  notes.push(n);buildEl(n);
+  emptyEl.style.display='none';updCnt();save();
+  setTimeout(()=>{const e=canvas.querySelector(`[data-id="${id}"] .note-bd`);if(e)e.focus()},50);
+}
+
+/* ── Auto Arrange (Grid) ── */
+function arrange(){
+  if(!notes.length)return;
+  const pad=20,gap=16;
+  const cw=canvas.clientWidth-pad*2;
+  const colW=296; // 280+gap
+  const cols=Math.max(1,Math.floor(cw/colW));
+
+  // filter out hidden (search) notes, arrange only visible ones
+  const hiddenIds=new Set();
+  canvas.querySelectorAll('.note.hidden-search').forEach(el=>hiddenIds.add(el.dataset.id));
+
+  // sort: pinned first, then by created time; skip hidden
+  const sorted=[...notes]
+    .filter(n=>!hiddenIds.has(n.id))
+    .sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0)||(a.created||0)-(b.created||0));
+
+  sorted.forEach((n,i)=>{
+    const col=i%cols;
+    const row=Math.floor(i/cols);
+    const heightsInCol=[];
+    for(let r=0;r<row;r++){
+      const idx=r*cols+col;
+      if(idx<sorted.length)heightsInCol.push(sorted[idx].h||200);
+    }
+    const cumH=heightsInCol.reduce((s,h)=>s+h+gap,0);
+    n.x=pad+col*colW;
+    n.y=pad+cumH;
+    const el=canvas.querySelector(`[data-id="${n.id}"]`);
+    if(el){
+      el.style.transition='left .35s ease,top .35s ease';
+      el.style.left=n.x+'px';el.style.top=n.y+'px';
+      setTimeout(()=>el.style.transition='',400);
+    }
+  });
+  save();
+}
+
+/* ── Export ── */
+function exportNotes(){
+  const blob=new Blob([JSON.stringify(notes,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`便笺_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();URL.revokeObjectURL(a.href);
+}
+
+/* ── Search ── */
+searchInput.addEventListener('input',()=>{
+  const q=searchInput.value.trim().toLowerCase();
+  canvas.querySelectorAll('.note').forEach(el=>{
+    const id=el.dataset.id;
+    const n=notes.find(x=>x.id===id);
+    if(!n){el.classList.add('hidden-search');return}
+    const text=(n.title||'')+' '+stripHtml(n.content||'');
+    el.classList.toggle('hidden-search',q&&!text.toLowerCase().includes(q));
+  });
+});
+
+function stripHtml(html){const d=document.createElement('div');d.innerHTML=html;return d.textContent||''}
+
+/* ── Clear ── */
+document.getElementById('btnClear').addEventListener('click',()=>{
+  if(!notes.length)return;
+  if(!confirm('确定清空所有便笺？不可恢复。'))return;
+  notes=[];renderAll();save();
+});
+
+/* ── Context Menu Actions ── */
+ctxMenu.querySelectorAll('.ctx-item').forEach(item=>{
+  item.addEventListener('click',()=>{
+    if(!ctxNoteId)return;
+    const act=item.dataset.act;
+    if(act==='delete')deleteNote(ctxNoteId);
+    if(act==='duplicate')duplicateNote(ctxNoteId);
+    if(act==='pin'){
+      const n=notes.find(x=>x.id===ctxNoteId);
+      if(n){n.pinned=!n.pinned;renderAll();save()}
+    }
+    if(act==='collapse'){
+      const n=notes.find(x=>x.id===ctxNoteId);
+      if(n){n.collapsed=!n.collapsed;
+        const el=canvas.querySelector(`[data-id="${ctxNoteId}"]`);
+        if(el){
+          el.classList.toggle('collapsed',n.collapsed);
+          const foldBtn=el.querySelector('.fold-btn');
+          if(foldBtn){
+            foldBtn.innerHTML=n.collapsed
+              ?`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>`
+              :`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>`;
+            foldBtn.title=n.collapsed?'展开':'折叠';
+          }
+        }
+        save();
+      }
+    }
+    ctxMenu.classList.remove('show');ctxNoteId=null;
+  });
+});
+
+/* ── Global Events ── */
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.ctx'))ctxMenu.classList.remove('show');
+  if(!e.target.closest('.cp-popup,.cp-btn'))
+    document.querySelectorAll('.cp-popup.show').forEach(p=>p.classList.remove('show'));
+});
+document.addEventListener('contextmenu',e=>{
+  if(!e.target.closest('.note'))ctxMenu.classList.remove('show');
+});
+/* double-click canvas to create */
+canvas.addEventListener('dblclick',e=>{
+  if(e.target.closest('.note'))return;
+  newNote();
+});
+document.addEventListener('keydown',e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key==='n'){e.preventDefault();newNote()}
+  if(e.key==='Escape'){
+    // close shortcuts panel first
+    if(shortcutsOverlay.classList.contains('show')){
+      shortcutsOverlay.classList.remove('show');return;
+    }
+    // then clear search
+    if(searchInput.value){
+      searchInput.value='';
+      searchInput.dispatchEvent(new Event('input'));
+      searchInput.blur();
+      return;
+    }
+    ctxMenu.classList.remove('show');
+    document.querySelectorAll('.cp-popup.show').forEach(p=>p.classList.remove('show'));
+  }
+  if((e.key==='?'||e.key==='？')&&!e.target.closest('[contenteditable],input')){
+    e.preventDefault();
+    shortcutsOverlay.classList.toggle('show');
+  }
+});
+
+/* ── Buttons ── */
+document.getElementById('btnNew').addEventListener('click',newNote);
+document.getElementById('btnArrange').addEventListener('click',arrange);
+document.getElementById('btnExport').addEventListener('click',exportNotes);
+
+/* ── Init ── */
+renderAll();
+</script>
+</body>
+</html>
