@@ -10,7 +10,7 @@ function createWindow() {
     height: 800,
     minWidth: 600,
     minHeight: 400,
-    title: '便笺',
+    title: '墨滴',
     icon: path.join(__dirname, 'icon.png'),
     webPreferences: {
       nodeIntegration: false,
@@ -43,7 +43,7 @@ function createTray() {
 
   const contextMenu = Menu.buildFromTemplate([
     {
-      label: '显示便笺',
+      label: '显示墨滴',
       click: () => {
         mainWindow.show();
         mainWindow.focus();
@@ -51,7 +51,7 @@ function createTray() {
     },
     { type: 'separator' },
     {
-      label: '新建便笺',
+      label: '新建一条',
       click: () => {
         mainWindow.show();
         mainWindow.focus();
@@ -68,7 +68,7 @@ function createTray() {
     },
   ]);
 
-  tray.setToolTip('便笺');
+  tray.setToolTip('墨滴');
   tray.setContextMenu(contextMenu);
 
   tray.on('double-click', () => {

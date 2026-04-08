@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>便笺</title>
+<title>墨滴</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
@@ -68,7 +68,7 @@ body{
 }
 .toolbar-brand svg{
   width:24px;height:24px;
-  stroke:var(--accent);fill:none;stroke-width:1.8;
+  color:var(--accent);
   -webkit-text-fill-color:unset;
 }
 .badge{
@@ -514,6 +514,62 @@ body.light ::-webkit-scrollbar-thumb:hover{background:rgba(0,0,0,.12)}
 }
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 body.light .toast{background:rgba(255,255,255,.94);color:#333;border-color:rgba(0,0,0,.06)}
+
+/* ═══════════════ Warm Message ═══════════════ */
+.warm-msg{
+  position:fixed;bottom:24px;right:24px;
+  display:flex;align-items:center;gap:10px;
+  padding:12px 18px;border-radius:16px;
+  background:rgba(20,20,42,.72);
+  backdrop-filter:blur(20px) saturate(1.4);
+  -webkit-backdrop-filter:blur(20px) saturate(1.4);
+  border:1px solid rgba(255,255,255,.06);
+  box-shadow:0 8px 32px rgba(0,0,0,.3);
+  font-size:13px;font-weight:500;
+  color:rgba(255,255,255,.65);
+  z-index:9998;cursor:pointer;
+  transition:all .4s cubic-bezier(.4,0,.2,1);
+  animation:warmFadeIn .5s ease;
+  pointer-events:auto;
+  max-width:320px;
+}
+.warm-msg:hover{
+  background:rgba(20,20,42,.85);
+  border-color:rgba(255,255,255,.1);
+  color:rgba(255,255,255,.85);
+}
+.warm-msg .warm-emoji{
+  font-size:20px;flex-shrink:0;
+  animation:gentlePulse 3s ease-in-out infinite;
+}
+.warm-msg .warm-text{
+  line-height:1.5;white-space:nowrap;
+}
+body.light .warm-msg{
+  background:rgba(255,255,255,.82);
+  border-color:rgba(0,0,0,.05);
+  box-shadow:0 4px 20px rgba(0,0,0,.06);
+  color:rgba(0,0,0,.5);
+}
+body.light .warm-msg:hover{
+  background:rgba(255,255,255,.94);
+  border-color:rgba(0,0,0,.08);
+  color:rgba(0,0,0,.7);
+}
+@keyframes warmFadeIn{
+  from{opacity:0;transform:translateY(12px) scale(.95)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+@keyframes gentlePulse{
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(1.08)}
+}
+.warm-msg.warm-fade-out{
+  opacity:0;transform:translateY(8px) scale(.96);
+}
+.warm-msg.warm-fade-in{
+  animation:warmFadeIn .45s ease forwards;
+}
 </style>
 </head>
 <body>
@@ -521,8 +577,15 @@ body.light .toast{background:rgba(255,255,255,.94);color:#333;border-color:rgba(
 <!-- Toolbar -->
 <div class="toolbar">
   <div class="toolbar-brand">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15.5 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.5L15.5 3Z"/><polyline points="14 3 14 8 21 8"/></svg>
-    便笺
+    <svg viewBox="0 0 24 24" fill="none">
+      <rect x="3" y="3" width="14" height="18" rx="3" fill="currentColor" opacity="0.9"/>
+      <rect x="7" y="1" width="14" height="18" rx="3" fill="currentColor" opacity="0.5"/>
+      <path d="M17 1 L21 1 L21 5 Z" fill="currentColor" opacity="0.25"/>
+      <line x1="7" y1="8" x2="15" y2="8" stroke="white" stroke-width="1.2" stroke-linecap="round" opacity="0.5"/>
+      <line x1="7" y1="11" x2="13" y2="11" stroke="white" stroke-width="1.2" stroke-linecap="round" opacity="0.4"/>
+      <circle cx="15" cy="17" r="2.5" fill="#f9a8d4" opacity="0.85"/>
+    </svg>
+    墨滴
   </div>
   <span class="badge" id="cnt">0 张</span>
   <div class="search-box">
@@ -565,7 +628,7 @@ body.light .toast{background:rgba(255,255,255,.94);color:#333;border-color:rgba(
 <div class="canvas" id="canvas">
   <div class="empty" id="empty">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15.5 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.5L15.5 3Z"/><polyline points="14 3 14 8 21 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
-    <p>还没有便笺</p>
+    <p>开始记录吧</p>
     <p class="hint">按 Ctrl+N 或双击空白区域</p>
   </div>
 </div>
@@ -602,6 +665,12 @@ body.light .toast{background:rgba(255,255,255,.94);color:#333;border-color:rgba(
 
 <!-- Toast -->
 <div class="toast" id="toast"></div>
+
+<!-- Warm Message -->
+<div class="warm-msg" id="warmMsg">
+  <span class="warm-emoji" id="warmEmoji">☀️</span>
+  <span class="warm-text" id="warmText">新的一天，加油！</span>
+</div>
 
 <script>
 /* ══════════════════════════════════════════════════
@@ -659,6 +728,9 @@ const ctxMenu=document.getElementById('ctxMenu');
 const searchInput=document.getElementById('searchInput');
 const shortcutsOverlay=document.getElementById('shortcutsOverlay');
 const toastEl=document.getElementById('toast');
+const warmMsgEl=document.getElementById('warmMsg');
+const warmEmojiEl=document.getElementById('warmEmoji');
+const warmTextEl=document.getElementById('warmText');
 
 /* ══════════════════════════════════════════════════
    Theme
@@ -686,6 +758,209 @@ function showToast(msg){
   toastEl.textContent=msg;toastEl.classList.add('show');
   clearTimeout(toastT);toastT=setTimeout(()=>toastEl.classList.remove('show'),1500);
 }
+
+/* ══════════════════════════════════════════════════
+   Warm Messages ☀️
+   ══════════════════════════════════════════════════ */
+const WARM_MESSAGES=[
+  // ☀️ 早安 6:00-9:00
+  {h:6,m:0, msgs:[
+    ['☀️','早安，新的一天开始了～'],
+    ['🌅','早上好，今天也要元气满满哦！'],
+    ['☕','早～先来杯咖啡提提神吧'],
+    ['🌤️','清晨的阳光，属于每一个努力的你'],
+    ['✨','新的一天，新的可能，加油！'],
+    ['🌻','今天的你比昨天更厉害了'],
+    ['🎵','早起的鸟儿有虫吃，早起的你有代码写'],
+    ['💪','起床就是胜利，继续加油！'],
+    ['📖','新的一页，由你书写'],
+    ['🌈','又是充满希望的一天，冲！'],
+  ]},
+  // 💪 上午工作 9:00-11:30
+  {h:9,m:0, msgs:[
+    ['💪','上午好，专注工作吧～'],
+    ['🎯','保持专注，你很棒！'],
+    ['📝','一件一件来，不着急'],
+    ['🔥','效率拉满，冲冲冲！'],
+    ['🧠','思路清晰的时候最适合深度工作'],
+    ['⚡','状态正佳，乘胜追击！'],
+    ['🏗️','一个函数一个函数地搭建，大楼就起来了'],
+    ['🧘','心无旁骛，沉浸在代码的世界里'],
+    ['📈','每个小进步都是大成就的积累'],
+    ['💎','耐心打磨，今天也能产出精品'],
+  ]},
+  // 🍱 午饭 11:30-13:30
+  {h:11,m:30, msgs:[
+    ['🍱','该吃午饭啦，别忘了吃饭～'],
+    ['🍜','辛苦了一上午，去吃点好的吧！'],
+    ['🥗','好好吃饭才有力气继续呀'],
+    ['🍚','午饭时间到！记得多吃蔬菜哦'],
+    ['🥢','再忙也要吃饭，身体最重要'],
+    ['🥘','代码先放一放，犒劳一下肚子'],
+    ['😋','想好吃什么了吗？别又点外卖随便对付'],
+    ['🍲','热乎乎的饭菜在等你呢'],
+    ['🧃','饭后来杯酸奶，助消化又开心'],
+    ['🍕','午餐是一天中最值得期待的时刻之一'],
+  ]},
+  // 😴 午休 13:30-14:00
+  {h:13,m:30, msgs:[
+    ['😴','午休时间，眯一会儿吧～'],
+    ['💤','小憩一下，下午更有精神'],
+    ['🌙','闭眼休息 15 分钟，充电中…'],
+    ['🧸','休息是为了走更远的路'],
+    ['☁️','趴在桌上眯一会儿也行呀'],
+    ['🛋️','沙发、工位、随便哪里，躺平五分钟'],
+    ['🫧','放空大脑，让思绪飘一会儿'],
+    ['⏰','定个 13:50 的闹钟，安心眯一下'],
+    ['🌊','深呼吸，吸～呼～放松'],
+    ['🧘‍♂️','闭目养神，也是一种高效'],
+  ]},
+  // 🌟 下午工作 14:00-17:30
+  {h:14,m:0, msgs:[
+    ['🌟','下午好，继续加油！'],
+    ['⚡','睡醒了就满血复活啦～'],
+    ['🚀','下半场开始，冲！'],
+    ['💪','距离下班还有一会儿，稳住！'],
+    ['🎵','下午适合听点音乐写代码'],
+    ['🧊','泡杯冰美式，打起精神来'],
+    ['🐛','Bug 不会自己修好，动手吧！'],
+    ['🎯','下午冲刺，目标清晰'],
+    ['🔄','休息好了就满状态了，开始干活！'],
+    ['📂','整理一下手头的活，按优先级推进'],
+  ]},
+  // 🍽️ 晚饭 17:30-19:00
+  {h:17,m:30, msgs:[
+    ['🍽️','晚饭时间，辛苦一天了～'],
+    ['🍜','下班啦！去吃顿好的犒劳自己'],
+    ['🌆','傍晚了，该休息一下了'],
+    ['🎉','今天的任务完成了吗？先吃饭！'],
+    ['🌙','日落了，好好享受晚餐吧'],
+    ['🏃','关电脑，走人，吃饭去！'],
+    ['🍻','辛苦了，今晚对自己好一点'],
+    ['🌇','看看窗外的晚霞，别一直盯着屏幕'],
+    ['🥡','今天想吃点什么？火锅？烧烤？'],
+    ['🧆','工作是做不完的，但晚饭是会凉的'],
+  ]},
+  // 🌙 晚间 19:00-22:00
+  {h:19,m:0, msgs:[
+    ['🌙','晚上好，放松一下吧～'],
+    ['📚','晚上适合学点新东西'],
+    ['🎬','追个剧？看个电影？'],
+    ['🫖','泡杯茶，享受夜晚的宁静'],
+    ['✨','忙碌了一天，这会儿属于自己了'],
+    ['🎮','打两把游戏放松一下？'],
+    ['🎵','戴上耳机，听一首喜欢的歌'],
+    ['📱','给家人朋友发条消息吧'],
+    ['🧘','做几分钟拉伸，活动活动筋骨'],
+    ['📖','读几页书，比刷手机有意思多了'],
+  ]},
+  // 🌃 夜深了 22:00-24:00
+  {h:22,m:0, msgs:[
+    ['🌃','夜深了，早点休息哦～'],
+    ['🛌','明天还有事呢，该睡啦'],
+    ['🌠','放下屏幕，让眼睛休息一下'],
+    ['🧸','晚安，好梦～'],
+    ['💤','熬夜伤身，早点睡吧'],
+    ['🌙','月亮都出来了，你也该休息了'],
+    ['🫶','今天辛苦了，给自己一个拥抱'],
+    ['🕯️','关灯，躺下，世界安静了'],
+    ['😊','带着今天的小成就，安心入睡'],
+    ['🌟','明天又是新的一天，晚安'],
+  ]},
+  // 🌑 深夜 0:00-6:00
+  {h:0,m:0, msgs:[
+    ['🌑','这么晚了还没睡呀？注意身体哦'],
+    ['🦉','夜猫子模式开启…不过还是早点休息吧'],
+    ['😶','凌晨了，身体比代码重要'],
+    ['⏰','这么晚了，明天起得来吗？'],
+    ['🫠','快去睡觉！明天再继续'],
+    ['💤','别熬了，保存一下就去睡吧'],
+    ['🫣','凌晨写出来的代码，明天可能要重构'],
+    ['😪','大脑已经不转了，强撑没用的'],
+    ['🌙','全世界都睡了，就你还在亮着屏幕'],
+    ['🛏️','床在召唤你，别抗拒了'],
+  ]},
+];
+
+function getWarmSlot(h,m){
+  // Find the current time slot
+  // Slots are ordered chronologically (6,9,11:30,13:30,14,17:30,19,22,0)
+  const curMin=h*60+m;
+  // Define slot boundaries in minutes from midnight
+  const slots=[
+    {start:0,   end:360,  idx:7},  // 0:00-6:00   深夜
+    {start:360, end:540,  idx:0},  // 6:00-9:00   早安
+    {start:540, end:690,  idx:1},  // 9:00-11:30  上午
+    {start:690, end:810,  idx:2},  // 11:30-13:30 午饭
+    {start:810, end:840,  idx:3},  // 13:30-14:00 午休
+    {start:840, end:1050, idx:4},  // 14:00-17:30 下午
+    {start:1050,end:1140, idx:5},  // 17:30-19:00 晚饭
+    {start:1140,end:1320, idx:6},  // 19:00-22:00 晚间
+    {start:1320,end:1440, idx:7},  // 22:00-24:00 夜深
+  ];
+  for(const s of slots){
+    if(curMin>=s.start && curMin<s.end) return s.idx;
+  }
+  return 7; // fallback to 夜深
+}
+
+// Use date as seed so message is consistent within each hour, but changes each slot
+function pickWarmMsg(){
+  const now=new Date();
+  const h=now.getHours(), m=now.getMinutes();
+  const slotIdx=getWarmSlot(h,m);
+  const slot=WARM_MESSAGES[slotIdx];
+  // Use hour+date as seed for stable pick within slot
+  const daySeed=now.getFullYear()*10000+(now.getMonth()+1)*100+now.getDate();
+  const seed=(daySeed*7+slotIdx*13)%slot.msgs.length;
+  return slot.msgs[seed];
+}
+
+let lastWarmSlot=-1;
+function updateWarmMsg(){
+  const now=new Date();
+  const h=now.getHours(), m=now.getMinutes();
+  const slotIdx=getWarmSlot(h,m);
+  if(slotIdx===lastWarmSlot) return;
+  lastWarmSlot=slotIdx;
+  const [emoji,text]=pickWarmMsg();
+  // Fade out, update, fade in
+  warmMsgEl.classList.add('warm-fade-out');
+  setTimeout(()=>{
+    warmEmojiEl.textContent=emoji;
+    warmTextEl.textContent=text;
+    warmMsgEl.classList.remove('warm-fade-out');
+    warmMsgEl.classList.add('warm-fade-in');
+    setTimeout(()=>warmMsgEl.classList.remove('warm-fade-in'),500);
+  },350);
+}
+
+// Init immediately
+updateWarmMsg();
+// Check every minute for slot changes
+setInterval(updateWarmMsg,60000);
+
+// Click to switch to a random message in current slot
+let warmAnimating=false;
+warmMsgEl.addEventListener('click',()=>{
+  if(warmAnimating) return;
+  warmAnimating=true;
+  const now=new Date();
+  const slotIdx=getWarmSlot(now.getHours(),now.getMinutes());
+  const slot=WARM_MESSAGES[slotIdx];
+  // Pick a different one from what's currently shown
+  let pick;
+  do{ pick=slot.msgs[Math.floor(Math.random()*slot.msgs.length)] }
+  while(pick[1]===warmTextEl.textContent && slot.msgs.length>1);
+  warmMsgEl.classList.add('warm-fade-out');
+  setTimeout(()=>{
+    warmEmojiEl.textContent=pick[0];
+    warmTextEl.textContent=pick[1];
+    warmMsgEl.classList.remove('warm-fade-out');
+    warmMsgEl.classList.add('warm-fade-in');
+    setTimeout(()=>{warmMsgEl.classList.remove('warm-fade-in');warmAnimating=false},450);
+  },300);
+});
 
 /* ══════════════════════════════════════════════════
    Shortcuts Help
