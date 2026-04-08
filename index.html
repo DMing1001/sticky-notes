@@ -8,27 +8,36 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
 :root{
-  --bg:#0c0c18;
-  --text:#eaeaf6;
-  --dim:#6a6a8e;
+  --bg:#0a0a14;
+  --bg2:#0e0e1a;
+  --text:#e8e8f4;
+  --text2:rgba(232,232,244,.6);
+  --dim:#5a5a7a;
   --accent:#8b5cf6;
   --accent2:#6d9fff;
+  --accent-glow:rgba(139,92,246,.15);
   --danger:#f43f6b;
-  --glass:rgba(18,18,38,.72);
+  --success:#22c55e;
+  --glass:rgba(14,14,26,.78);
   --glass-border:rgba(255,255,255,.06);
-  --radius:12px;
+  --radius:14px;
+  --radius-sm:10px;
   --shadow:0 8px 32px rgba(0,0,0,.55);
+  --transition:.25s cubic-bezier(.4,0,.2,1);
 }
 
-/* ── Light Mode ── */
 body.light{
-  --bg:#f0eff4;
+  --bg:#f5f4f9;
+  --bg2:#eeedf3;
   --text:#1a1a2e;
+  --text2:rgba(26,26,46,.55);
   --dim:#8888a0;
   --accent:#7c3aed;
   --accent2:#3b82f6;
+  --accent-glow:rgba(124,58,237,.1);
   --danger:#e11d48;
-  --glass:rgba(240,239,244,.82);
+  --success:#16a34a;
+  --glass:rgba(245,244,249,.82);
   --glass-border:rgba(0,0,0,.06);
   --shadow:0 4px 20px rgba(0,0,0,.08);
 }
@@ -37,97 +46,102 @@ body{
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;
   background:var(--bg);color:var(--text);
   height:100vh;overflow:hidden;user-select:none;
-  transition:background .35s ease,color .35s ease;
+  transition:background .4s ease,color .4s ease;
 }
 
 /* ═══════════════ Toolbar ═══════════════ */
 .toolbar{
-  position:fixed;top:0;left:0;right:0;height:52px;
+  position:fixed;top:0;left:0;right:0;height:56px;
   background:var(--glass);
-  backdrop-filter:blur(24px) saturate(1.4);
-  -webkit-backdrop-filter:blur(24px) saturate(1.4);
+  backdrop-filter:blur(28px) saturate(1.5);
+  -webkit-backdrop-filter:blur(28px) saturate(1.5);
   border-bottom:1px solid var(--glass-border);
-  display:flex;align-items:center;padding:0 16px;gap:8px;z-index:9999;
-  transition:background .35s ease,border-color .35s ease;
+  display:flex;align-items:center;padding:0 20px;gap:8px;z-index:9999;
+  transition:background var(--transition),border-color var(--transition);
 }
 .toolbar-brand{
-  font-size:16px;font-weight:800;letter-spacing:.4px;
+  font-size:17px;font-weight:800;letter-spacing:.5px;
   background:linear-gradient(135deg,var(--accent),var(--accent2));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;
   background-clip:text;
-  display:flex;align-items:center;gap:8px;margin-right:4px;
+  display:flex;align-items:center;gap:8px;margin-right:6px;flex-shrink:0;
 }
 .toolbar-brand svg{
-  width:22px;height:22px;
-  stroke:var(--accent);fill:none;stroke-width:2;
+  width:24px;height:24px;
+  stroke:var(--accent);fill:none;stroke-width:1.8;
   -webkit-text-fill-color:unset;
 }
 .badge{
   font-size:11px;font-weight:600;color:var(--accent);
   padding:3px 10px;border-radius:20px;
-  background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.15);
-  margin-right:10px;white-space:nowrap;
+  background:var(--accent-glow);border:1px solid rgba(139,92,246,.12);
+  margin-right:12px;white-space:nowrap;flex-shrink:0;
 }
 
 /* search */
-.search-box{position:relative;margin-right:auto}
+.search-box{position:relative;margin-right:auto;flex-shrink:1}
 .search-box input{
-  width:220px;height:34px;border-radius:17px;
-  border:1px solid rgba(255,255,255,.06);
+  width:220px;height:36px;border-radius:18px;
+  border:1px solid var(--glass-border);
   background:rgba(255,255,255,.03);color:var(--text);
-  font-size:13px;padding:0 12px 0 34px;outline:none;
+  font-size:13px;padding:0 14px 0 36px;outline:none;
   transition:all .3s ease;
 }
 .search-box input:focus{
-  border-color:rgba(139,92,246,.35);width:280px;
-  background:rgba(255,255,255,.06);
-  box-shadow:0 0 0 3px rgba(139,92,246,.08);
+  border-color:rgba(139,92,246,.3);width:280px;
+  background:rgba(255,255,255,.05);
+  box-shadow:0 0 0 3px rgba(139,92,246,.06);
 }
 .search-box input::placeholder{color:var(--dim);font-weight:400}
 .search-box svg{
-  position:absolute;left:11px;top:50%;transform:translateY(-50%);
+  position:absolute;left:12px;top:50%;transform:translateY(-50%);
   width:15px;height:15px;color:var(--dim);pointer-events:none;
 }
 
 /* buttons */
 .btn{
   display:inline-flex;align-items:center;gap:5px;
-  height:32px;padding:0 14px;border-radius:16px;
-  border:1px solid rgba(255,255,255,.07);
+  height:34px;padding:0 14px;border-radius:17px;
+  border:1px solid var(--glass-border);
   background:rgba(255,255,255,.03);color:var(--text);
-  font-size:12px;font-weight:500;cursor:pointer;
-  transition:all .25s ease;white-space:nowrap;
+  font-size:12.5px;font-weight:500;cursor:pointer;
+  transition:all var(--transition);white-space:nowrap;flex-shrink:0;
 }
 .btn:hover{
-  background:rgba(139,92,246,.18);border-color:rgba(139,92,246,.3);
+  background:var(--accent-glow);border-color:rgba(139,92,246,.25);
   color:#fff;transform:translateY(-1px);
-  box-shadow:0 4px 12px rgba(139,92,246,.15);
+  box-shadow:0 4px 14px rgba(139,92,246,.12);
 }
-.btn:active{transform:translateY(0)}
+.btn:active{transform:translateY(0);box-shadow:none}
+.btn.active{
+  background:var(--accent-glow);border-color:rgba(139,92,246,.3);
+  color:var(--accent);
+}
 .btn.danger:hover{
-  background:rgba(244,63,107,.15);border-color:rgba(244,63,107,.3);
-  box-shadow:0 4px 12px rgba(244,63,107,.12);color:var(--danger);
+  background:rgba(244,63,107,.12);border-color:rgba(244,63,107,.25);
+  box-shadow:0 4px 14px rgba(244,63,107,.1);color:var(--danger);
 }
 .btn svg{width:15px;height:15px;flex-shrink:0}
-.sep{width:1px;height:20px;background:rgba(255,255,255,.06);margin:0 2px}
+.sep{width:1px;height:22px;background:var(--glass-border);margin:0 4px;flex-shrink:0}
 
 /* ═══════════════ Canvas ═══════════════ */
 .canvas{
-  position:fixed;top:52px;left:0;right:0;bottom:0;overflow:auto;
+  position:fixed;top:56px;left:0;right:0;bottom:0;overflow:auto;
   background-color:var(--bg);
   background-image:
-    radial-gradient(ellipse 600px 400px at 20% 30%,rgba(139,92,246,.04) 0%,transparent 70%),
-    radial-gradient(ellipse 500px 500px at 80% 70%,rgba(109,159,255,.03) 0%,transparent 70%),
-    linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);
-  background-size:100% 100%,100% 100%,20px 20px,20px 20px;
+    radial-gradient(ellipse 700px 500px at 15% 25%,rgba(139,92,246,.04) 0%,transparent 70%),
+    radial-gradient(ellipse 600px 600px at 85% 75%,rgba(109,159,255,.03) 0%,transparent 70%),
+    linear-gradient(rgba(255,255,255,.015) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.015) 1px,transparent 1px);
+  background-size:100% 100%,100% 100%,24px 24px,24px 24px;
+  transition:background-color var(--transition);
 }
 body.light .canvas{
   background-image:
-    radial-gradient(ellipse 600px 400px at 20% 30%,rgba(139,92,246,.03) 0%,transparent 70%),
-    radial-gradient(ellipse 500px 500px at 80% 70%,rgba(59,130,246,.02) 0%,transparent 70%),
-    linear-gradient(rgba(0,0,0,.03) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(0,0,0,.03) 1px,transparent 1px);
+    radial-gradient(ellipse 700px 500px at 15% 25%,rgba(124,58,237,.03) 0%,transparent 70%),
+    radial-gradient(ellipse 600px 600px at 85% 75%,rgba(59,130,246,.02) 0%,transparent 70%),
+    linear-gradient(rgba(0,0,0,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,0,0,.025) 1px,transparent 1px);
 }
 
 /* ═══════════════ Note Card ═══════════════ */
@@ -137,168 +151,182 @@ body.light .canvas{
   border:1.5px solid var(--c-border);
   background:var(--c-bg);
   box-shadow:var(--shadow);display:flex;flex-direction:column;
-  overflow:hidden;transition:box-shadow .25s,border-color .25s,transform .15s;
+  overflow:hidden;transition:box-shadow .3s,border-color .3s,transform .15s;
 }
-.note:hover{box-shadow:0 12px 44px rgba(0,0,0,.6);border-color:var(--c-accent)}
+.note:hover{
+  box-shadow:0 14px 48px rgba(0,0,0,.6);
+  border-color:var(--c-accent);
+}
 .note.dragging{
-  opacity:.92;z-index:10000!important;cursor:grabbing;
-  box-shadow:0 20px 60px rgba(0,0,0,.7);transform:scale(1.03);
+  opacity:.93;z-index:10000!important;cursor:grabbing;
+  box-shadow:0 24px 64px rgba(0,0,0,.7);transform:scale(1.03);
 }
-.note.collapsed .note-bd,.note.collapsed .note-meta{display:none}
+.note.collapsed .note-bd,.note.collapsed .note-meta,.note.collapsed .note-imgs{display:none}
 .note.collapsed .rz{display:none}
-.note.pinned{border-width:2px;box-shadow:0 8px 32px rgba(0,0,0,.5),0 0 0 1px var(--c-accent)}
+.note.pinned{border-width:2px}
 .note.pinned::after{
-  content:'📌';position:absolute;top:-2px;left:6px;font-size:12px;z-index:2;
-  filter:drop-shadow(0 1px 2px rgba(0,0,0,.5));
+  content:'📌';position:absolute;top:-3px;left:8px;font-size:11px;z-index:2;
+  filter:drop-shadow(0 1px 3px rgba(0,0,0,.6));
 }
 .note.hidden-search{display:none}
 
-/* ── Color Themes — vivid & saturated ── */
+/* ── Checklist mode indicator ── */
+.note.checklist-mode .note-bd{padding-top:4px}
+.note.checklist-mode .note-hd::before{
+  content:'☑';position:absolute;top:-1px;right:44px;font-size:10px;
+  color:var(--c-accent);opacity:.5;
+}
+
+/* ── Color Themes ── */
 .note[data-color="amber"]{
   --c-bg:linear-gradient(145deg,#2e2508,#382e0a);
-  --c-border:rgba(255,200,50,.32);--c-dot:#ffc832;--c-accent:#ffc832;
+  --c-border:rgba(255,200,50,.3);--c-dot:#ffc832;--c-accent:#ffc832;
   background:var(--c-bg);
 }
 .note[data-color="rose"]{
   --c-bg:linear-gradient(145deg,#2e0c18,#38101e);
-  --c-border:rgba(255,100,130,.3);--c-dot:#ff6e8a;--c-accent:#ff6e8a;
+  --c-border:rgba(255,100,130,.28);--c-dot:#ff6e8a;--c-accent:#ff6e8a;
   background:var(--c-bg);
 }
 .note[data-color="azure"]{
   --c-bg:linear-gradient(145deg,#0c1e2e,#102838);
-  --c-border:rgba(80,180,255,.3);--c-dot:#50b4ff;--c-accent:#50b4ff;
+  --c-border:rgba(80,180,255,.28);--c-dot:#50b4ff;--c-accent:#50b4ff;
   background:var(--c-bg);
 }
 .note[data-color="jade"]{
   --c-bg:linear-gradient(145deg,#0c2e16,#10381c);
-  --c-border:rgba(80,220,120,.3);--c-dot:#50dc78;--c-accent:#50dc78;
+  --c-border:rgba(80,220,120,.28);--c-dot:#50dc78;--c-accent:#50dc78;
   background:var(--c-bg);
 }
 .note[data-color="iris"]{
   --c-bg:linear-gradient(145deg,#1e0c2e,#281038);
-  --c-border:rgba(170,100,255,.3);--c-dot:#aa64ff;--c-accent:#aa64ff;
+  --c-border:rgba(170,100,255,.28);--c-dot:#aa64ff;--c-accent:#aa64ff;
   background:var(--c-bg);
 }
 .note[data-color="graphite"]{
   --c-bg:linear-gradient(145deg,#1e1e2e,#26263a);
-  --c-border:rgba(140,140,180,.25);--c-dot:#9898b8;--c-accent:#9898b8;
+  --c-border:rgba(140,140,180,.22);--c-dot:#9898b8;--c-accent:#9898b8;
   background:var(--c-bg);
 }
 .note[data-color="tangerine"]{
   --c-bg:linear-gradient(145deg,#2e1a08,#38200a);
-  --c-border:rgba(255,150,50,.32);--c-dot:#ff9632;--c-accent:#ff9632;
+  --c-border:rgba(255,150,50,.3);--c-dot:#ff9632;--c-accent:#ff9632;
   background:var(--c-bg);
 }
 .note[data-color="teal"]{
   --c-bg:linear-gradient(145deg,#0c2a2e,#103438);
-  --c-border:rgba(50,210,220,.3);--c-dot:#32d2dc;--c-accent:#32d2dc;
+  --c-border:rgba(50,210,220,.28);--c-dot:#32d2dc;--c-accent:#32d2dc;
   background:var(--c-bg);
 }
 
 /* ── Light Mode Note Colors ── */
 body.light .note[data-color="amber"]{
   --c-bg:linear-gradient(145deg,#fff8e1,#fff3c4);
-  --c-border:rgba(245,180,20,.35);--c-dot:#f5b414;--c-accent:#f5b414;
+  --c-border:rgba(245,180,20,.3);--c-dot:#f5b414;--c-accent:#d4940a;
   background:var(--c-bg);
 }
 body.light .note[data-color="rose"]{
   --c-bg:linear-gradient(145deg,#fff0f3,#ffe4e8);
-  --c-border:rgba(244,63,94,.25);--c-dot:#f43f5e;--c-accent:#f43f5e;
+  --c-border:rgba(244,63,94,.2);--c-dot:#f43f5e;--c-accent:#dc2626;
   background:var(--c-bg);
 }
 body.light .note[data-color="azure"]{
   --c-bg:linear-gradient(145deg,#eff6ff,#dbeafe);
-  --c-border:rgba(59,130,246,.25);--c-dot:#3b82f6;--c-accent:#3b82f6;
+  --c-border:rgba(59,130,246,.2);--c-dot:#3b82f6;--c-accent:#2563eb;
   background:var(--c-bg);
 }
 body.light .note[data-color="jade"]{
   --c-bg:linear-gradient(145deg,#f0fdf4,#dcfce7);
-  --c-border:rgba(34,197,94,.25);--c-dot:#22c55e;--c-accent:#22c55e;
+  --c-border:rgba(34,197,94,.2);--c-dot:#22c55e;--c-accent:#16a34a;
   background:var(--c-bg);
 }
 body.light .note[data-color="iris"]{
   --c-bg:linear-gradient(145deg,#f5f3ff,#ede9fe);
-  --c-border:rgba(139,92,246,.25);--c-dot:#8b5cf6;--c-accent:#8b5cf6;
+  --c-border:rgba(139,92,246,.2);--c-dot:#8b5cf6;--c-accent:#7c3aed;
   background:var(--c-bg);
 }
 body.light .note[data-color="graphite"]{
   --c-bg:linear-gradient(145deg,#f8fafc,#f1f5f9);
-  --c-border:rgba(148,163,184,.3);--c-dot:#94a3b8;--c-accent:#94a3b8;
+  --c-border:rgba(148,163,184,.25);--c-dot:#94a3b8;--c-accent:#64748b;
   background:var(--c-bg);
 }
 body.light .note[data-color="tangerine"]{
   --c-bg:linear-gradient(145deg,#fff7ed,#ffedd5);
-  --c-border:rgba(249,115,22,.25);--c-dot:#f97316;--c-accent:#f97316;
+  --c-border:rgba(249,115,22,.2);--c-dot:#f97316;--c-accent:#ea580c;
   background:var(--c-bg);
 }
 body.light .note[data-color="teal"]{
   --c-bg:linear-gradient(145deg,#f0fdfa,#ccfbf1);
-  --c-border:rgba(20,184,166,.25);--c-dot:#14b8a6;--c-accent:#14b8a6;
+  --c-border:rgba(20,184,166,.2);--c-dot:#14b8a6;--c-accent:#0d9488;
   background:var(--c-bg);
 }
 
 /* light mode overrides */
 body.light .note-title{color:#1a1a2e}
 body.light .note-bd{color:rgba(0,0,0,.78)}
-body.light .note-bd:empty::before{color:rgba(0,0,0,.2)}
+body.light .note-bd:empty::before{color:rgba(0,0,0,.18)}
 body.light .note-bd b,.note-bd strong{color:#000}
-body.light .note-meta{color:rgba(0,0,0,.25)}
-body.light .rz::after{border-color:rgba(0,0,0,.15)}
-body.light .empty svg{color:var(--accent)}
-body.light .empty p{color:rgba(0,0,0,.25)}
-body.light .empty .hint{color:rgba(0,0,0,.15)}
+body.light .note-meta{color:rgba(0,0,0,.22)}
+body.light .rz::after{border-color:rgba(0,0,0,.12)}
+body.light .empty svg{color:var(--accent);opacity:.15}
+body.light .empty p{color:rgba(0,0,0,.22)}
+body.light .empty .hint{color:rgba(0,0,0,.13)}
 body.light .nbtn{color:#aaa}
-body.light .nbtn:hover{color:#333;background:rgba(0,0,0,.06)}
-body.light .nbtn.del:hover{color:var(--danger);background:rgba(225,29,72,.08)}
-body.light .note:hover{box-shadow:0 8px 32px rgba(0,0,0,.1);border-color:var(--c-accent)}
-body.light .note.dragging{box-shadow:0 16px 48px rgba(0,0,0,.15)}
-body.light .cp-popup{background:rgba(255,255,255,.95);border-color:rgba(0,0,0,.08);box-shadow:0 8px 28px rgba(0,0,0,.12)}
-body.light .ctx{background:rgba(255,255,255,.95);border-color:rgba(0,0,0,.06);box-shadow:0 8px 28px rgba(0,0,0,.1)}
+body.light .nbtn:hover{color:#333;background:rgba(0,0,0,.05)}
+body.light .nbtn.del:hover{color:var(--danger);background:rgba(225,29,72,.06)}
+body.light .note:hover{box-shadow:0 10px 36px rgba(0,0,0,.1);border-color:var(--c-accent)}
+body.light .note.dragging{box-shadow:0 18px 52px rgba(0,0,0,.14)}
+body.light .cp-popup{background:rgba(255,255,255,.96);border-color:rgba(0,0,0,.07);box-shadow:0 10px 32px rgba(0,0,0,.1)}
+body.light .ctx{background:rgba(255,255,255,.96);border-color:rgba(0,0,0,.05);box-shadow:0 10px 32px rgba(0,0,0,.1)}
 body.light .ctx-item{color:#333}
-body.light .ctx-item:hover{background:rgba(0,0,0,.05)}
-body.light .ctx-sep{background:rgba(0,0,0,.06)}
+body.light .ctx-item:hover{background:rgba(0,0,0,.04)}
+body.light .ctx-sep{background:rgba(0,0,0,.05)}
+body.light .font-popup{background:rgba(255,255,255,.96);border-color:rgba(0,0,0,.07);box-shadow:0 10px 32px rgba(0,0,0,.1)}
+body.light .font-popup .row span{color:#555}
+body.light .check-item.done .check-text{color:rgba(0,0,0,.28)}
 
 /* header */
 .note-hd{
   display:flex;align-items:center;padding:10px 10px;cursor:grab;gap:6px;flex-shrink:0;
+  position:relative;
 }
 .note.dragging .note-hd{cursor:grabbing}
 .note-title{
   flex:1;font-size:14px;font-weight:700;color:#f4f4ff;
   background:none;border:none;outline:none;cursor:text;user-select:text;
-  min-width:0;letter-spacing:.2px;
+  min-width:0;letter-spacing:.3px;
 }
-.note-title::placeholder{color:rgba(255,255,255,.2);font-weight:500}
+.note-title::placeholder{color:rgba(255,255,255,.18);font-weight:500}
 .note-meta{
-  font-size:10px;color:rgba(255,255,255,.18);padding:0 12px 6px;flex-shrink:0;
-  font-weight:500;letter-spacing:.3px;
+  font-size:10px;color:rgba(255,255,255,.16);padding:0 12px 8px;flex-shrink:0;
+  font-weight:500;letter-spacing:.4px;
 }
-.note-btns{display:flex;gap:2px;opacity:0;transition:opacity .2s}
+.note-btns{display:flex;gap:1px;opacity:0;transition:opacity .2s}
 .note:hover .note-btns{opacity:1}
 .nbtn{
   width:26px;height:26px;border:none;background:transparent;color:var(--dim);
   cursor:pointer;border-radius:8px;display:flex;align-items:center;justify-content:center;
   transition:all .18s;
 }
-.nbtn:hover{background:rgba(255,255,255,.1);color:var(--text)}
-.nbtn.del:hover{color:var(--danger);background:rgba(244,63,107,.1)}
-.nbtn.pin-active{color:var(--c-accent);opacity:1}
+.nbtn:hover{background:rgba(255,255,255,.08);color:var(--text)}
+.nbtn.del:hover{color:var(--danger);background:rgba(244,63,107,.08)}
+.nbtn.active-btn{color:var(--c-accent)!important;opacity:1}
 .nbtn svg{width:14px;height:14px}
 
 /* color picker */
 .cp-popup{
-  position:absolute;top:42px;right:10px;
-  background:rgba(20,20,40,.95);backdrop-filter:blur(16px);
-  border:1px solid rgba(255,255,255,.08);border-radius:12px;
+  position:absolute;top:44px;right:10px;
+  background:rgba(20,20,40,.96);backdrop-filter:blur(16px);
+  border:1px solid rgba(255,255,255,.07);border-radius:var(--radius-sm);
   padding:10px;display:none;gap:7px;flex-wrap:wrap;width:120px;
-  box-shadow:0 12px 36px rgba(0,0,0,.65);z-index:100;
+  box-shadow:0 14px 40px rgba(0,0,0,.6);z-index:100;
 }
 .cp-popup.show{display:flex}
 .cdot{
   width:24px;height:24px;border-radius:7px;border:2px solid transparent;
-  cursor:pointer;transition:all .18s;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);
+  cursor:pointer;transition:all .18s;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12);
 }
-.cdot:hover{transform:scale(1.2);box-shadow:0 0 8px var(--cdot-color,inset 0 0 0 1px rgba(0,0,0,.15))}
+.cdot:hover{transform:scale(1.2)}
 .cdot.on{border-color:#fff;transform:scale(1.1)}
 .cdot[data-c="amber"]{background:#ffc832}
 .cdot[data-c="rose"]{background:#ff6e8a}
@@ -309,25 +337,88 @@ body.light .ctx-sep{background:rgba(0,0,0,.06)}
 .cdot[data-c="tangerine"]{background:#ff9632}
 .cdot[data-c="teal"]{background:#32d2dc}
 
+/* font size popup */
+.font-popup{
+  position:absolute;top:44px;right:40px;
+  background:rgba(20,20,40,.96);backdrop-filter:blur(16px);
+  border:1px solid rgba(255,255,255,.07);border-radius:var(--radius-sm);
+  padding:10px 14px;display:none;flex-direction:column;gap:6px;min-width:140px;
+  box-shadow:0 14px 40px rgba(0,0,0,.6);z-index:100;
+}
+.font-popup.show{display:flex}
+.font-popup .row{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  font-size:12px;color:rgba(255,255,255,.6);
+}
+.font-popup .fs-btn{
+  width:28px;height:28px;border:1px solid rgba(255,255,255,.08);border-radius:8px;
+  background:rgba(255,255,255,.04);color:var(--text);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:14px;
+  transition:all .15s;
+}
+.font-popup .fs-btn:hover{background:rgba(139,92,246,.2);border-color:rgba(139,92,246,.3)}
+.font-popup .fs-val{font-weight:600;min-width:40px;text-align:center;font-size:13px;color:var(--accent)}
+
 /* content */
 .note-bd{
-  flex:1;padding:2px 14px 10px;font-size:15px;line-height:1.72;
-  color:rgba(255,255,255,.85);outline:none;cursor:text;user-select:text;
+  flex:1;padding:2px 14px 10px;font-size:15px;line-height:1.75;
+  color:rgba(255,255,255,.82);outline:none;cursor:text;user-select:text;
   overflow-y:auto;white-space:pre-wrap;word-break:break-word;
+  min-height:60px;
+  transition:font-size .15s ease;
 }
-.note-bd:empty::before{content:'写点什么…';color:rgba(255,255,255,.18)}
+.note-bd:empty::before{content:'写点什么…';color:rgba(255,255,255,.15)}
 .note-bd b,.note-bd strong{color:#fff}
+
+/* images in note */
+.note-bd img{
+  max-width:100%;border-radius:8px;margin:6px 0;
+  display:block;box-shadow:0 2px 12px rgba(0,0,0,.3);
+  cursor:pointer;transition:box-shadow .2s;
+}
+.note-bd img:hover{box-shadow:0 4px 20px rgba(0,0,0,.5)}
+
+/* ── Checklist ── */
+.check-item{
+  display:flex;align-items:flex-start;gap:8px;padding:3px 0;
+  line-height:1.65;transition:opacity .2s;
+}
+.check-item.done{opacity:.45}
+.check-item.done .check-text{text-decoration:line-through;color:rgba(255,255,255,.28)}
+body.light .check-item.done .check-text{color:rgba(0,0,0,.25)}
+
+.check-box{
+  width:18px;height:18px;min-width:18px;border-radius:5px;margin-top:3px;
+  border:2px solid var(--c-accent);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;background:transparent;
+}
+.check-box:hover{background:rgba(255,255,255,.06)}
+body.light .check-box:hover{background:rgba(0,0,0,.04)}
+.check-item.done .check-box{
+  background:var(--c-accent);border-color:var(--c-accent);
+}
+.check-box svg{
+  width:12px;height:12px;stroke:#fff;stroke-width:3;fill:none;
+  opacity:0;transform:scale(.5);transition:all .2s;
+}
+.check-item.done .check-box svg{opacity:1;transform:scale(1)}
+
+.check-text{
+  flex:1;outline:none;min-width:20px;color:rgba(255,255,255,.82);
+}
+body.light .check-text{color:rgba(0,0,0,.78)}
 
 /* resize */
 .rz{
-  position:absolute;bottom:0;right:0;width:18px;height:18px;
+  position:absolute;bottom:0;right:0;width:20px;height:20px;
   cursor:nwse-resize;opacity:0;transition:opacity .18s;
 }
-.note:hover .rz{opacity:.3}
+.note:hover .rz{opacity:.25}
 .rz::after{
-  content:'';position:absolute;bottom:5px;right:5px;
+  content:'';position:absolute;bottom:6px;right:6px;
   width:7px;height:7px;
-  border-right:2px solid rgba(255,255,255,.2);border-bottom:2px solid rgba(255,255,255,.2);
+  border-right:1.5px solid rgba(255,255,255,.2);border-bottom:1.5px solid rgba(255,255,255,.2);
 }
 
 /* ═══════════════ Empty ═══════════════ */
@@ -335,80 +426,94 @@ body.light .ctx-sep{background:rgba(0,0,0,.06)}
   position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
   text-align:center;pointer-events:none;
 }
-.empty svg{width:64px;height:64px;opacity:.12;margin-bottom:14px;color:var(--accent)}
-.empty p{font-size:17px;color:rgba(255,255,255,.2);font-weight:500}
-.empty .hint{font-size:13px;margin-top:8px;color:rgba(255,255,255,.12);font-weight:400}
+.empty svg{width:72px;height:72px;opacity:.1;margin-bottom:16px;color:var(--accent)}
+.empty p{font-size:18px;color:rgba(255,255,255,.18);font-weight:600}
+.empty .hint{font-size:13px;margin-top:10px;color:rgba(255,255,255,.1);font-weight:400}
 
 /* ═══════════════ Context Menu ═══════════════ */
 .ctx{
   position:fixed;
-  background:rgba(20,20,42,.92);backdrop-filter:blur(20px);
-  border:1px solid rgba(255,255,255,.07);border-radius:12px;
-  padding:5px;min-width:170px;
-  box-shadow:0 12px 36px rgba(0,0,0,.6);z-index:99999;display:none;
+  background:rgba(20,20,42,.94);backdrop-filter:blur(24px);
+  border:1px solid rgba(255,255,255,.06);border-radius:var(--radius-sm);
+  padding:5px;min-width:180px;
+  box-shadow:0 14px 40px rgba(0,0,0,.55);z-index:99999;display:none;
 }
 .ctx.show{display:block}
 .ctx-item{
-  display:flex;align-items:center;gap:8px;
+  display:flex;align-items:center;gap:9px;
   padding:8px 12px;border-radius:8px;font-size:13px;font-weight:500;
-  color:rgba(255,255,255,.75);cursor:pointer;transition:all .12s;
+  color:rgba(255,255,255,.72);cursor:pointer;transition:all .12s;
 }
-.ctx-item:hover{background:rgba(255,255,255,.07);color:#fff}
+.ctx-item:hover{background:rgba(255,255,255,.06);color:#fff}
 .ctx-item svg{width:14px;height:14px;color:var(--dim);flex-shrink:0}
 .ctx-item.danger{color:var(--danger)}
 .ctx-item.danger svg{color:var(--danger)}
-.ctx-item.danger:hover{background:rgba(244,63,107,.1)}
+.ctx-item.danger:hover{background:rgba(244,63,107,.08)}
 .ctx-sep{height:1px;background:rgba(255,255,255,.05);margin:4px 8px}
 
 /* ═══════════════ Animations ═══════════════ */
-@keyframes popIn{from{opacity:0;transform:scale(.9) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
-.note.entering{animation:popIn .25s cubic-bezier(.22,1,.36,1)}
-@keyframes popOut{from{opacity:1;transform:scale(1)}to{opacity:0;transform:scale(.82) translateY(8px)}}
-.note.removing{animation:popOut .18s ease-in forwards;pointer-events:none}
+@keyframes popIn{from{opacity:0;transform:scale(.88) translateY(12px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.note.entering{animation:popIn .28s cubic-bezier(.22,1,.36,1)}
+@keyframes popOut{from{opacity:1;transform:scale(1)}to{opacity:0;transform:scale(.8) translateY(10px)}}
+.note.removing{animation:popOut .2s ease-in forwards;pointer-events:none}
 
-/* ═══════════════ Shortcuts Help ═══════════════ */
-.shortcuts-overlay{
+/* ═══════════════ Modal Overlay ═══════════════ */
+.overlay{
   position:fixed;top:0;left:0;right:0;bottom:0;
-  background:rgba(0,0,0,.5);backdrop-filter:blur(6px);
+  background:rgba(0,0,0,.45);backdrop-filter:blur(8px);
   z-index:999999;display:none;align-items:center;justify-content:center;
 }
-.shortcuts-overlay.show{display:flex}
-.shortcuts-panel{
-  background:rgba(20,20,42,.95);backdrop-filter:blur(20px);
-  border:1px solid rgba(255,255,255,.08);border-radius:16px;
-  padding:28px 32px;min-width:360px;max-width:420px;
-  box-shadow:0 20px 60px rgba(0,0,0,.5);
+.overlay.show{display:flex}
+.panel{
+  background:rgba(16,16,36,.96);backdrop-filter:blur(24px);
+  border:1px solid rgba(255,255,255,.07);border-radius:18px;
+  padding:28px 34px;min-width:380px;max-width:440px;
+  box-shadow:0 24px 64px rgba(0,0,0,.5);
 }
-.shortcuts-panel h3{
-  font-size:16px;font-weight:700;color:var(--accent);margin-bottom:18px;
-  display:flex;align-items:center;gap:8px;
+.panel h3{
+  font-size:17px;font-weight:700;color:var(--accent);margin-bottom:20px;
+  display:flex;align-items:center;gap:9px;
 }
-.shortcuts-panel .row{
+.panel .row{
   display:flex;justify-content:space-between;align-items:center;
-  padding:6px 0;font-size:13px;
+  padding:7px 0;font-size:13px;
 }
-.shortcuts-panel .row span{color:rgba(255,255,255,.6)}
-.shortcuts-panel .key{
-  display:inline-block;padding:2px 8px;border-radius:5px;
-  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);
-  font-family:monospace;font-size:12px;color:rgba(255,255,255,.8);
-  min-width:28px;text-align:center;
+.panel .row span{color:rgba(255,255,255,.55)}
+.panel .key{
+  display:inline-block;padding:2px 8px;border-radius:6px;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);
+  font-family:'SF Mono',Monaco,Consolas,monospace;font-size:11.5px;
+  color:rgba(255,255,255,.75);min-width:28px;text-align:center;
 }
-body.light .shortcuts-panel{
-  background:rgba(255,255,255,.96);border-color:rgba(0,0,0,.06);
-  box-shadow:0 20px 60px rgba(0,0,0,.15);
+body.light .panel{
+  background:rgba(255,255,255,.97);border-color:rgba(0,0,0,.05);
+  box-shadow:0 24px 64px rgba(0,0,0,.12);
 }
-body.light .shortcuts-panel h3{color:var(--accent)}
-body.light .shortcuts-panel .row span{color:#555}
-body.light .shortcuts-panel .key{
-  background:rgba(0,0,0,.05);border-color:rgba(0,0,0,.08);color:#333;
+body.light .panel h3{color:var(--accent)}
+body.light .panel .row span{color:#555}
+body.light .panel .key{
+  background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.06);color:#333;
 }
 
 /* scrollbar */
 ::-webkit-scrollbar{width:5px}
 ::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:rgba(255,255,255,.05);border-radius:3px}
-::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.1)}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.04);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.08)}
+body.light ::-webkit-scrollbar-thumb{background:rgba(0,0,0,.08)}
+body.light ::-webkit-scrollbar-thumb:hover{background:rgba(0,0,0,.12)}
+
+/* undo/redo toast */
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:rgba(20,20,40,.92);backdrop-filter:blur(16px);
+  border:1px solid rgba(255,255,255,.08);border-radius:12px;
+  padding:8px 18px;font-size:12.5px;color:rgba(255,255,255,.7);
+  box-shadow:0 8px 28px rgba(0,0,0,.4);z-index:999999;
+  opacity:0;transition:all .3s ease;pointer-events:none;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+body.light .toast{background:rgba(255,255,255,.94);color:#333;border-color:rgba(0,0,0,.06)}
 </style>
 </head>
 <body>
@@ -416,7 +521,7 @@ body.light .shortcuts-panel .key{
 <!-- Toolbar -->
 <div class="toolbar">
   <div class="toolbar-brand">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15.5 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.5L15.5 3Z"/><polyline points="14 3 14 8 21 8"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15.5 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.5L15.5 3Z"/><polyline points="14 3 14 8 21 8"/></svg>
     便笺
   </div>
   <span class="badge" id="cnt">0 张</span>
@@ -424,12 +529,19 @@ body.light .shortcuts-panel .key{
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
     <input id="searchInput" placeholder="搜索便笺…" spellcheck="false"/>
   </div>
+  <button class="btn" id="btnUndo" title="撤销 Ctrl+Z">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+  </button>
+  <button class="btn" id="btnRedo" title="重做 Ctrl+Y">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+  </button>
+  <div class="sep"></div>
   <button class="btn" id="btnNew" title="Ctrl+N">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
     新建
   </button>
   <button class="btn" id="btnArrange" title="自动排列">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
     排列
   </button>
   <button class="btn" id="btnTheme" title="切换主题">
@@ -454,24 +566,25 @@ body.light .shortcuts-panel .key{
   <div class="empty" id="empty">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15.5 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.5L15.5 3Z"/><polyline points="14 3 14 8 21 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
     <p>还没有便笺</p>
-    <p class="hint">按 Ctrl+N 或点击「新建」开始</p>
+    <p class="hint">按 Ctrl+N 或双击空白区域</p>
   </div>
 </div>
 
 <!-- Context Menu -->
 <div class="ctx" id="ctxMenu">
   <div class="ctx-item" data-act="pin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 17v5"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg>置顶</div>
-  <div class="ctx-item" data-act="collapse"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" y1="10" x2="21" y2="3"/><line x1="3" y1="21" x2="10" y2="14"/></svg>折叠/展开</div>
-  <div class="ctx-item" data-act="duplicate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>复制</div>
+  <div class="ctx-item" data-act="collapse"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" y1="10" x2="21" y2="3"/><line x1="3" y1="21" x2="10" y2="14"/></svg>折叠 / 展开</div>
+  <div class="ctx-item" data-act="checklist"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="6" height="6" rx="1"/><path d="M5 8l1.5 1.5L9 6"/><line x1="13" y1="8" x2="21" y2="8"/><rect x="3" y="13" width="6" height="6" rx="1"/><line x1="13" y1="16" x2="21" y2="16"/></svg>清单模式</div>
+  <div class="ctx-item" data-act="duplicate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>复制便笺</div>
   <div class="ctx-sep"></div>
   <div class="ctx-item danger" data-act="delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>删除</div>
 </div>
 
 <!-- Shortcuts Overlay -->
-<div class="shortcuts-overlay" id="shortcutsOverlay">
-  <div class="shortcuts-panel">
+<div class="overlay" id="shortcutsOverlay">
+  <div class="panel">
     <h3>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="6" y1="8" x2="6.01" y2="8"/><line x1="10" y1="8" x2="10.01" y2="8"/><line x1="14" y1="8" x2="14.01" y2="8"/><line x1="18" y1="8" x2="18.01" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="6" y1="16" x2="18" y2="16"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="6" y1="8" x2="6.01" y2="8"/><line x1="10" y1="8" x2="10.01" y2="8"/><line x1="14" y1="8" x2="14.01" y2="8"/><line x1="18" y1="8" x2="18.01" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="6" y1="16" x2="18" y2="16"/></svg>
       快捷键
     </h3>
     <div class="row"><span>新建便笺</span><span><span class="key">Ctrl</span> + <span class="key">N</span></span></div>
@@ -479,33 +592,77 @@ body.light .shortcuts-panel .key{
     <div class="row"><span>加粗</span><span><span class="key">Ctrl</span> + <span class="key">B</span></span></div>
     <div class="row"><span>斜体</span><span><span class="key">Ctrl</span> + <span class="key">I</span></span></div>
     <div class="row"><span>下划线</span><span><span class="key">Ctrl</span> + <span class="key">U</span></span></div>
-    <div class="row"><span>关闭弹窗 / 清搜索</span><span><span class="key">Esc</span></span></div>
+    <div class="row"><span>撤销</span><span><span class="key">Ctrl</span> + <span class="key">Z</span></span></div>
+    <div class="row"><span>重做</span><span><span class="key">Ctrl</span> + <span class="key">Y</span></span></div>
+    <div class="row"><span>粘贴图片</span><span><span class="key">Ctrl</span> + <span class="key">V</span></span></div>
     <div class="row"><span>右键便笺</span><span>更多操作</span></div>
-    <div style="text-align:center;margin-top:16px;font-size:12px;color:rgba(255,255,255,.25)">按 Esc 或点击关闭</div>
+    <div style="text-align:center;margin-top:18px;font-size:12px;color:rgba(255,255,255,.22)">按 Esc 关闭</div>
   </div>
 </div>
 
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
 <script>
+/* ══════════════════════════════════════════════════
+   Config & State
+   ══════════════════════════════════════════════════ */
 const COLORS=['amber','rose','azure','jade','iris','graphite','tangerine','teal'];
-const KEY='sticky-notes-v2';
+const KEY='sticky-notes-v3';
 const GRID=20;
 
-let notes=JSON.parse(localStorage.getItem(KEY)||'[]');
-// migrate old color names
+let notes=[];
+try{notes=JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){notes=[]}
+// migrate from v2
+if(!notes.length){
+  try{notes=JSON.parse(localStorage.getItem('sticky-notes-v2')||'[]')}catch(e){}
+}
 const colorMap={yellow:'amber',coral:'rose',sky:'azure',mint:'jade',violet:'iris',slate:'graphite',peach:'tangerine',ocean:'teal',pink:'rose',blue:'azure',green:'jade',purple:'iris',gray:'graphite'};
-notes=notes.map(n=>({...n,color:colorMap[n.color]||n.color}));
+notes=notes.map(n=>({...n,color:colorMap[n.color]||n.color,fontSize:n.fontSize||15,checklist:!!n.checklist,checks:n.checks||[]}));
 
 let maxZ=notes.reduce((m,n)=>Math.max(m,n.z||10),10);
 let ctxNoteId=null;
 
+// Global undo stack (note-level changes)
+const undoStack=[];
+const redoStack=[];
+const MAX_UNDO=50;
+
+function snapshot(){
+  undoStack.push(JSON.stringify(notes));
+  if(undoStack.length>MAX_UNDO)undoStack.shift();
+  redoStack.length=0;
+}
+
+function undo(){
+  if(!undoStack.length){showToast('没有更多撤销');return}
+  redoStack.push(JSON.stringify(notes));
+  notes=JSON.parse(undoStack.pop());
+  renderAll();localStorage.setItem(KEY,JSON.stringify(notes));
+  showToast('已撤销');
+}
+function redo(){
+  if(!redoStack.length){showToast('没有更多重做');return}
+  undoStack.push(JSON.stringify(notes));
+  notes=JSON.parse(redoStack.pop());
+  renderAll();localStorage.setItem(KEY,JSON.stringify(notes));
+  showToast('已重做');
+}
+
+/* ══════════════════════════════════════════════════
+   DOM Refs
+   ══════════════════════════════════════════════════ */
 const canvas=document.getElementById('canvas');
 const emptyEl=document.getElementById('empty');
 const cntEl=document.getElementById('cnt');
 const ctxMenu=document.getElementById('ctxMenu');
 const searchInput=document.getElementById('searchInput');
 const shortcutsOverlay=document.getElementById('shortcutsOverlay');
+const toastEl=document.getElementById('toast');
 
-/* ── Theme ── */
+/* ══════════════════════════════════════════════════
+   Theme
+   ══════════════════════════════════════════════════ */
 let theme=localStorage.getItem('sticky-theme')||'dark';
 function applyTheme(){
   document.body.classList.toggle('light',theme==='light');
@@ -521,28 +678,37 @@ document.getElementById('btnTheme').addEventListener('click',()=>{
   applyTheme();
 });
 
-/* ── Shortcuts Help ── */
-document.getElementById('btnHelp').addEventListener('click',()=>{
-  shortcutsOverlay.classList.add('show');
-});
-shortcutsOverlay.addEventListener('click',e=>{
-  if(e.target===shortcutsOverlay)shortcutsOverlay.classList.remove('show');
-});
+/* ══════════════════════════════════════════════════
+   Toast
+   ══════════════════════════════════════════════════ */
+let toastT;
+function showToast(msg){
+  toastEl.textContent=msg;toastEl.classList.add('show');
+  clearTimeout(toastT);toastT=setTimeout(()=>toastEl.classList.remove('show'),1500);
+}
 
-/* ── Save ── */
+/* ══════════════════════════════════════════════════
+   Shortcuts Help
+   ══════════════════════════════════════════════════ */
+document.getElementById('btnHelp').addEventListener('click',()=>shortcutsOverlay.classList.add('show'));
+shortcutsOverlay.addEventListener('click',e=>{if(e.target===shortcutsOverlay)shortcutsOverlay.classList.remove('show')});
+
+/* ══════════════════════════════════════════════════
+   Save & Count
+   ══════════════════════════════════════════════════ */
 let saveT;
 function save(){clearTimeout(saveT);saveT=setTimeout(()=>localStorage.setItem(KEY,JSON.stringify(notes)),200)}
 function updCnt(){
-  const visible=notes.length;
   const pinned=notes.filter(n=>n.pinned).length;
-  cntEl.textContent=visible+' 张'+(pinned?` · ${pinned} 置顶`:'');
+  cntEl.textContent=notes.length+' 张'+(pinned?` · ${pinned} 置顶`:'');
 }
 
-/* ── Format time ── */
+/* ══════════════════════════════════════════════════
+   Helpers
+   ══════════════════════════════════════════════════ */
 function fmtTime(ts){
   if(!ts)return'';
-  const d=new Date(ts);
-  const now=new Date();
+  const d=new Date(ts),now=new Date();
   const pad=n=>String(n).padStart(2,'0');
   const time=pad(d.getHours())+':'+pad(d.getMinutes());
   if(d.toDateString()===now.toDateString())return'今天 '+time;
@@ -550,24 +716,30 @@ function fmtTime(ts){
   if(d.toDateString()===y.toDateString())return'昨天 '+time;
   return`${d.getMonth()+1}/${d.getDate()} ${time}`;
 }
+function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML}
+function stripHtml(html){const d=document.createElement('div');d.innerHTML=html;return d.textContent||''}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
 
-/* ── Render All ── */
+/* ══════════════════════════════════════════════════
+   Render All
+   ══════════════════════════════════════════════════ */
 function renderAll(){
   canvas.querySelectorAll('.note').forEach(e=>e.remove());
-  // pinned first, then by z
   const sorted=[...notes].sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0)||(b.z||0)-(a.z||0));
-  sorted.forEach(n=>buildEl(n));
+  sorted.forEach(n=>buildNote(n));
   emptyEl.style.display=notes.length?'none':'block';
   updCnt();
 }
 
-/* ── Escape ── */
-function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML}
-
-/* ── Build Note Element ── */
-function buildEl(n){
+/* ══════════════════════════════════════════════════
+   Build Note Element
+   ══════════════════════════════════════════════════ */
+function buildNote(n){
   const el=document.createElement('div');
-  el.className='note entering'+(n.pinned?' pinned':'')+(n.collapsed?' collapsed':'');
+  el.className='note entering'
+    +(n.pinned?' pinned':'')
+    +(n.collapsed?' collapsed':'')
+    +(n.checklist?' checklist-mode':'');
   el.dataset.id=n.id;el.dataset.color=n.color||'amber';
   el.style.cssText=`left:${n.x}px;top:${n.y}px;width:${n.w||280}px;min-height:${n.h||180}px;z-index:${n.z||++maxZ}`;
 
@@ -579,74 +751,253 @@ function buildEl(n){
     ?`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>`
     :`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>`;
 
+  const checkIcon=n.checklist
+    ?`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>`
+    :`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>`;
+
   el.innerHTML=`
     <div class="note-hd">
       <input class="note-title" value="${esc(n.title||'')}" placeholder="标题" spellcheck="false"/>
       <div class="cp-popup" id="cp-${n.id}">
         ${COLORS.map(c=>`<div class="cdot${c===n.color?' on':''}" data-c="${c}"></div>`).join('')}
       </div>
+      <div class="font-popup" id="fp-${n.id}">
+        <div class="row"><span>字号</span><span class="fs-val" id="fsv-${n.id}">${n.fontSize||15}px</span></div>
+        <div class="row">
+          <button class="fs-btn" data-delta="-1">−</button>
+          <button class="fs-btn" data-delta="0" style="font-size:11px;width:auto;padding:0 8px">重置</button>
+          <button class="fs-btn" data-delta="1">+</button>
+        </div>
+      </div>
       <div class="note-btns">
-        <button class="nbtn pin-btn${n.pinned?' pin-active':''}" title="${n.pinned?'取消置顶':'置顶'}">${pinIcon}</button>
+        <button class="nbtn pin-btn${n.pinned?' active-btn':''}" title="${n.pinned?'取消置顶':'置顶'}">${pinIcon}</button>
+        <button class="nbtn check-btn${n.checklist?' active-btn':''}" title="${n.checklist?'关闭清单':'清单模式'}">${checkIcon}</button>
         <button class="nbtn cp-btn" title="颜色"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg></button>
-        <button class="nbtn fold-btn" title="${n.collapse?'展开':'折叠'}">${foldIcon}</button>
+        <button class="nbtn font-btn" title="字号"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9.5" y1="4" x2="9.5" y2="20"/><line x1="14.5" y1="4" x2="14.5" y2="20"/><line x1="7" y1="20" x2="17" y2="20"/></svg></button>
+        <button class="nbtn fold-btn" title="${n.collapsed?'展开':'折叠'}">${foldIcon}</button>
         <button class="nbtn del" title="删除"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
       </div>
     </div>
-    <div class="note-bd" contenteditable="true">${esc(n.content||'')}</div>
+    <div class="note-bd" contenteditable="true" style="font-size:${n.fontSize||15}px"></div>
     <div class="note-meta">${fmtTime(n.created)}</div>
     <div class="rz"></div>`;
 
   canvas.appendChild(el);
-  setTimeout(()=>el.classList.remove('entering'),220);
+  setTimeout(()=>el.classList.remove('entering'),250);
 
   /* refs */
   const hd=el.querySelector('.note-hd');
   const titleEl=el.querySelector('.note-title');
   const bd=el.querySelector('.note-bd');
   const cpPopup=el.querySelector('.cp-popup');
+  const fontPopup=el.querySelector('.font-popup');
   const rz=el.querySelector('.rz');
   const pinBtn=el.querySelector('.pin-btn');
   const foldBtn=el.querySelector('.fold-btn');
+  const checkBtn=el.querySelector('.check-btn');
 
-  /* focus / z */
-  el.addEventListener('mousedown',()=>{if(!n.pinned){n.z=++maxZ;el.style.zIndex=n.z}save()});
+  /* ── Populate content ── */
+  if(n.checklist && n.checks && n.checks.length){
+    renderChecklist(bd,n);
+  } else {
+    bd.innerHTML=n.content||'';
+  }
 
-  /* title */
-  titleEl.addEventListener('input',()=>{n.title=titleEl.value;save()});
+  /* ── Focus / z ── */
+  el.addEventListener('mousedown',()=>{if(!n.pinned){n.z=++maxZ;el.style.zIndex=n.z;save()}});
 
-  /* content */
-  bd.addEventListener('input',()=>{n.content=bd.innerHTML;save()});
+  /* ── Title ── */
+  titleEl.addEventListener('input',()=>{snapshot();n.title=titleEl.value;save()});
 
-  /* keyboard shortcuts in content */
+  /* ── Content edit (normal mode) ── */
+  bd.addEventListener('input',()=>{
+    if(n.checklist)return; // checklist handles its own saves
+    snapshot();
+    n.content=bd.innerHTML;
+    save();
+  });
+
+  /* ── Image paste ── */
+  bd.addEventListener('paste',e=>{
+    const items=(e.clipboardData||{}).items||[];
+    let hasImage=false;
+    for(const item of items){
+      if(item.type.startsWith('image/')){
+        e.preventDefault();
+        hasImage=true;
+        const blob=item.getAsFile();
+        const reader=new FileReader();
+        reader.onload=ev=>{
+          snapshot();
+          const img=document.createElement('img');
+          img.src=ev.target.result;
+          img.style.maxWidth='100%';
+          img.style.borderRadius='8px';
+          img.style.margin='6px 0';
+          img.style.display='block';
+          // insert at cursor
+          const sel=window.getSelection();
+          if(sel.rangeCount){
+            const range=sel.getRangeAt(0);
+            range.deleteContents();
+            range.insertNode(img);
+            // add line break after image
+            const br=document.createElement('br');
+            img.after(br);
+            // move cursor after
+            const r2=document.createRange();
+            r2.setStartAfter(br);
+            r2.collapse(true);
+            sel.removeAllRanges();
+            sel.addRange(r2);
+          } else {
+            bd.appendChild(img);
+          }
+          if(n.checklist){
+            extractChecksFromDom(bd,n);
+          } else {
+            n.content=bd.innerHTML;
+          }
+          save();
+        };
+        reader.readAsDataURL(blob);
+      }
+    }
+  });
+
+  /* ── Keyboard ── */
   bd.addEventListener('keydown',e=>{
     if(e.ctrlKey||e.metaKey){
       if(e.key==='b'){e.preventDefault();document.execCommand('bold')}
       if(e.key==='i'){e.preventDefault();document.execCommand('italic')}
       if(e.key==='u'){e.preventDefault();document.execCommand('underline')}
     }
+    // checklist: Enter to add new item, Backspace on empty to remove
+    if(n.checklist){
+      if(e.key==='Enter'&&!e.shiftKey){
+        e.preventDefault();
+        const sel=window.getSelection();
+        if(!sel.rangeCount)return;
+        const curItem=findCheckItem(sel.anchorNode);
+        if(curItem){
+          snapshot();
+          const textEl=curItem.querySelector('.check-text');
+          // split text at cursor
+          const range=sel.getRangeAt(0);
+          const beforeRange=document.createRange();
+          beforeRange.setStart(textEl,0);
+          beforeRange.setEnd(range.startContainer,range.startOffset);
+          const afterRange=document.createRange();
+          afterRange.setStart(range.endContainer,range.endOffset);
+          afterRange.setEnd(textEl,textEl.childNodes.length);
+          // create new item
+          const newDiv=document.createElement('div');
+          newDiv.className='check-item';
+          newDiv.innerHTML=`<div class="check-box"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="check-text" contenteditable="true"></div>`;
+          curItem.after(newDiv);
+          // focus new text
+          const newtext=newDiv.querySelector('.check-text');
+          newtext.focus();
+          // save
+          extractChecksFromDom(bd,n);
+          save();
+        }
+      }
+      if(e.key==='Backspace'){
+        const sel=window.getSelection();
+        if(!sel.rangeCount)return;
+        const curItem=findCheckItem(sel.anchorNode);
+        if(curItem){
+          const textEl=curItem.querySelector('.check-text');
+          if(textEl&&(textEl.textContent===''||textEl.textContent==='\n')){
+            e.preventDefault();
+            snapshot();
+            const prev=curItem.previousElementSibling;
+            curItem.remove();
+            if(prev&&prev.classList.contains('check-item')){
+              const pt=prev.querySelector('.check-text');
+              pt.focus();
+              // move cursor to end
+              const range=document.createRange();
+              range.selectNodeContents(pt);
+              range.collapse(false);
+              sel.removeAllRanges();
+              sel.addRange(range);
+            }
+            extractChecksFromDom(bd,n);
+            save();
+          }
+        }
+      }
+    }
   });
 
-  /* color picker */
+  /* ── Checklist toggle (click on checkbox) ── */
+  bd.addEventListener('click',e=>{
+    const box=e.target.closest('.check-box');
+    if(box){
+      e.preventDefault();
+      const item=box.closest('.check-item');
+      if(item){
+        snapshot();
+        item.classList.toggle('done');
+        extractChecksFromDom(bd,n);
+        save();
+      }
+    }
+    // image preview (simple: click to toggle size)
+    const img=e.target.closest('img');
+    if(img){
+      img.style.maxWidth=img.style.maxWidth==='100%'?'none':'100%';
+    }
+  });
+
+  /* ── Checklist save on text input ── */
+  bd.addEventListener('input',e=>{
+    if(n.checklist){
+      extractChecksFromDom(bd,n);
+      save();
+    }
+  });
+
+  /* ── Color picker ── */
   el.querySelector('.cp-btn').addEventListener('click',e=>{
     e.stopPropagation();
-    document.querySelectorAll('.cp-popup.show').forEach(p=>p.classList.remove('show'));
+    closeAllPopups();
     cpPopup.classList.toggle('show');
   });
   cpPopup.querySelectorAll('.cdot').forEach(dot=>{
     dot.addEventListener('click',e=>{
-      e.stopPropagation();
+      e.stopPropagation();snapshot();
       const c=dot.dataset.c;n.color=c;el.dataset.color=c;
       cpPopup.querySelectorAll('.cdot').forEach(d=>d.classList.remove('on'));
       dot.classList.add('on');cpPopup.classList.remove('show');save();
     });
   });
 
-  /* pin */
+  /* ── Font size ── */
+  el.querySelector('.font-btn').addEventListener('click',e=>{
+    e.stopPropagation();closeAllPopups();
+    fontPopup.classList.toggle('show');
+  });
+  fontPopup.querySelectorAll('.fs-btn').forEach(btn=>{
+    btn.addEventListener('click',e=>{
+      e.stopPropagation();snapshot();
+      const delta=parseInt(btn.dataset.delta);
+      if(delta===0){n.fontSize=15}
+      else{n.fontSize=Math.max(10,Math.min(32,(n.fontSize||15)+delta))}
+      bd.style.fontSize=n.fontSize+'px';
+      document.getElementById('fsv-'+n.id).textContent=n.fontSize+'px';
+      save();
+    });
+  });
+
+  /* ── Pin ── */
   pinBtn.addEventListener('click',e=>{
-    e.stopPropagation();
+    e.stopPropagation();snapshot();
     n.pinned=!n.pinned;
     el.classList.toggle('pinned',n.pinned);
-    pinBtn.classList.toggle('pin-active',n.pinned);
+    pinBtn.classList.toggle('active-btn',n.pinned);
     pinBtn.title=n.pinned?'取消置顶':'置顶';
     pinBtn.innerHTML=n.pinned
       ?`<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><path d="M12 17v5"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg>`
@@ -655,9 +1006,38 @@ function buildEl(n){
     save();updCnt();
   });
 
-  /* fold */
+  /* ── Checklist toggle ── */
+  checkBtn.addEventListener('click',e=>{
+    e.stopPropagation();snapshot();
+    n.checklist=!n.checklist;
+    el.classList.toggle('checklist-mode',n.checklist);
+    checkBtn.classList.toggle('active-btn',n.checklist);
+    checkBtn.title=n.checklist?'关闭清单':'清单模式';
+    checkBtn.innerHTML=n.checklist
+      ?`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>`
+      :`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>`;
+
+    if(n.checklist){
+      // convert current content to checklist items
+      const text=stripHtml(n.content||'').trim();
+      const lines=text?text.split('\n').filter(l=>l.trim()):[''];
+      n.checks=lines.map(l=>({text:l.trim(),done:false}));
+      n.content=bd.innerHTML; // save old content
+      renderChecklist(bd,n);
+    } else {
+      // convert checklist back to text
+      extractChecksFromDom(bd,n);
+      const text=n.checks.map(c=>c.text).join('\n');
+      n.content=text;
+      n.checks=[];
+      bd.innerHTML=text;
+    }
+    save();
+  });
+
+  /* ── Fold ── */
   foldBtn.addEventListener('click',e=>{
-    e.stopPropagation();
+    e.stopPropagation();snapshot();
     n.collapsed=!n.collapsed;
     el.classList.toggle('collapsed',n.collapsed);
     foldBtn.innerHTML=n.collapsed
@@ -667,24 +1047,29 @@ function buildEl(n){
     save();
   });
 
-  /* delete */
-  el.querySelector('.del').addEventListener('click',e=>{
-    e.stopPropagation();deleteNote(n.id);
-  });
+  /* ── Delete ── */
+  el.querySelector('.del').addEventListener('click',e=>{e.stopPropagation();deleteNote(n.id)});
 
-  /* context menu */
+  /* ── Context menu ── */
   el.addEventListener('contextmenu',e=>{
     e.preventDefault();e.stopPropagation();
     ctxNoteId=n.id;
-    ctxMenu.style.left=e.clientX+'px';
-    ctxMenu.style.top=e.clientY+'px';
+    // update checklist label
+    const clItem=ctxMenu.querySelector('[data-act="checklist"]');
+    if(clItem){
+      clItem.innerHTML=n.checklist
+        ?`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>关闭清单模式`
+        :`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="6" height="6" rx="1"/><path d="M5 8l1.5 1.5L9 6"/><line x1="13" y1="8" x2="21" y2="8"/><rect x="3" y="13" width="6" height="6" rx="1"/><line x1="13" y1="16" x2="21" y2="16"/></svg>清单模式`;
+    }
+    ctxMenu.style.left=Math.min(e.clientX,window.innerWidth-200)+'px';
+    ctxMenu.style.top=Math.min(e.clientY,window.innerHeight-200)+'px';
     ctxMenu.classList.add('show');
   });
 
   /* ── Drag ── */
   let drag=false,ox,oy;
   hd.addEventListener('mousedown',e=>{
-    if(e.target.closest('.nbtn,.cdot,.cp-popup,.note-title'))return;
+    if(e.target.closest('.nbtn,.cdot,.fs-btn,.cp-popup,.font-popup,.note-title'))return;
     drag=true;el.classList.add('dragging');
     const r=el.getBoundingClientRect();
     ox=e.clientX-r.left;oy=e.clientY-r.top;
@@ -700,13 +1085,9 @@ function buildEl(n){
 
   const mv=e=>{
     if(drag){
-      let x=e.clientX-ox,y=e.clientY-oy-52;
-      // snap to grid
-      x=Math.round(x/GRID)*GRID;
-      y=Math.round(y/GRID)*GRID;
-      // bounds: keep at least 60px visible
-      const maxX=canvas.scrollWidth-60;
-      const maxY=canvas.scrollHeight-60;
+      let x=e.clientX-ox,y=e.clientY-oy-56;
+      x=Math.round(x/GRID)*GRID;y=Math.round(y/GRID)*GRID;
+      const maxX=canvas.scrollWidth-60,maxY=canvas.scrollHeight-60;
       n.x=Math.max(-el.offsetWidth+60,Math.min(x,maxX));
       n.y=Math.max(-el.offsetHeight+60,Math.min(y,maxY));
       el.style.left=n.x+'px';el.style.top=n.y+'px';
@@ -715,82 +1096,124 @@ function buildEl(n){
       let w=Math.max(200,rw+e.clientX-rmx);
       let h=Math.max(180,rh+e.clientY-rmy);
       w=Math.round(w/GRID)*GRID;h=Math.round(h/GRID)*GRID;
-      n.w=w;n.h=h;
-      el.style.width=w+'px';el.style.minHeight=h+'px';
+      n.w=w;n.h=h;el.style.width=w+'px';el.style.minHeight=h+'px';
     }
   };
   const up=()=>{
     if(drag){drag=false;el.classList.remove('dragging');save()}
     if(rsz){rsz=false;save()}
   };
+  // store for cleanup
+  el._mv=mv;el._up=up;
   document.addEventListener('mousemove',mv);
   document.addEventListener('mouseup',up);
 }
 
-/* ── Delete ── */
+/* ══════════════════════════════════════════════════
+   Checklist Helpers
+   ══════════════════════════════════════════════════ */
+function renderChecklist(bd,n){
+  bd.innerHTML='';
+  (n.checks||[]).forEach(c=>{
+    const div=document.createElement('div');
+    div.className='check-item'+(c.done?' done':'');
+    div.innerHTML=`<div class="check-box"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="check-text" contenteditable="true">${esc(c.text)}</div>`;
+    bd.appendChild(div);
+  });
+  // add empty item if last is not empty
+  const checks=n.checks||[];
+  if(!checks.length||checks[checks.length-1].text){
+    const div=document.createElement('div');
+    div.className='check-item';
+    div.innerHTML=`<div class="check-box"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="check-text" contenteditable="true"></div>`;
+    bd.appendChild(div);
+  }
+}
+
+function extractChecksFromDom(bd,n){
+  const items=bd.querySelectorAll('.check-item');
+  n.checks=[];
+  items.forEach(item=>{
+    const text=(item.querySelector('.check-text')||{}).textContent||'';
+    const done=item.classList.contains('done');
+    n.checks.push({text:text.trim(),done});
+  });
+  // remove trailing empty items except keep one
+  while(n.checks.length>1&&!n.checks[n.checks.length-1].text&&!n.checks[n.checks.length-1].done){
+    n.checks.pop();
+  }
+}
+
+function findCheckItem(node){
+  while(node&&!node.classList?.contains('check-item')){
+    node=node.parentElement;
+    if(!node||node.classList?.contains('note-bd'))return null;
+  }
+  return node;
+}
+
+/* ══════════════════════════════════════════════════
+   CRUD
+   ══════════════════════════════════════════════════ */
 function deleteNote(id){
+  snapshot();
   const el=canvas.querySelector(`[data-id="${id}"]`);
   if(el){
     el.classList.add('removing');
     setTimeout(()=>{
+      // cleanup listeners
+      if(el._mv)document.removeEventListener('mousemove',el._mv);
+      if(el._up)document.removeEventListener('mouseup',el._up);
       notes=notes.filter(x=>x.id!==id);
       el.remove();emptyEl.style.display=notes.length?'none':'block';updCnt();save();
-    },160);
+    },180);
   }
 }
 
-/* ── Duplicate ── */
 function duplicateNote(id){
+  snapshot();
   const src=notes.find(n=>n.id===id);
   if(!src)return;
-  const id2=Date.now().toString(36)+Math.random().toString(36).slice(2,6);
-  const n={...src,id:id2,x:src.x+30,y:src.y+30,z:++maxZ,created:Date.now(),pinned:false};
-  notes.push(n);buildEl(n);emptyEl.style.display='none';updCnt();save();
+  const n={...src,id:uid(),x:src.x+30,y:src.y+30,z:++maxZ,created:Date.now(),pinned:false,checks:[...(src.checks||[]).map(c=>({...c}))]};
+  notes.push(n);buildNote(n);emptyEl.style.display='none';updCnt();save();
 }
 
-/* ── New Note ── */
 function newNote(){
-  const id=Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+  snapshot();
+  const id=uid();
   const x=Math.round((40+Math.random()*120+canvas.scrollLeft)/GRID)*GRID;
   const y=Math.round((20+Math.random()*60+canvas.scrollTop)/GRID)*GRID;
   const n={
     id,title:'',content:'',
     color:COLORS[Math.floor(Math.random()*COLORS.length)],
     x,y,w:280,h:200,z:++maxZ,created:Date.now(),pinned:false,collapsed:false,
+    fontSize:15,checklist:false,checks:[],
   };
-  notes.push(n);buildEl(n);
+  notes.push(n);buildNote(n);
   emptyEl.style.display='none';updCnt();save();
   setTimeout(()=>{const e=canvas.querySelector(`[data-id="${id}"] .note-bd`);if(e)e.focus()},50);
 }
 
-/* ── Auto Arrange (Grid) ── */
+/* ── Auto Arrange ── */
 function arrange(){
   if(!notes.length)return;
+  snapshot();
   const pad=20,gap=16;
   const cw=canvas.clientWidth-pad*2;
-  const colW=296; // 280+gap
+  const colW=296;
   const cols=Math.max(1,Math.floor(cw/colW));
-
-  // filter out hidden (search) notes, arrange only visible ones
   const hiddenIds=new Set();
   canvas.querySelectorAll('.note.hidden-search').forEach(el=>hiddenIds.add(el.dataset.id));
-
-  // sort: pinned first, then by created time; skip hidden
-  const sorted=[...notes]
-    .filter(n=>!hiddenIds.has(n.id))
-    .sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0)||(a.created||0)-(b.created||0));
-
+  const sorted=[...notes].filter(n=>!hiddenIds.has(n.id)).sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0)||(a.created||0)-(b.created||0));
   sorted.forEach((n,i)=>{
     const col=i%cols;
     const row=Math.floor(i/cols);
-    const heightsInCol=[];
+    let cumH=0;
     for(let r=0;r<row;r++){
       const idx=r*cols+col;
-      if(idx<sorted.length)heightsInCol.push(sorted[idx].h||200);
+      if(idx<sorted.length)cumH+=(sorted[idx].h||200)+gap;
     }
-    const cumH=heightsInCol.reduce((s,h)=>s+h+gap,0);
-    n.x=pad+col*colW;
-    n.y=pad+cumH;
+    n.x=pad+col*colW;n.y=pad+cumH;
     const el=canvas.querySelector(`[data-id="${n.id}"]`);
     if(el){
       el.style.transition='left .35s ease,top .35s ease';
@@ -817,21 +1240,21 @@ searchInput.addEventListener('input',()=>{
     const id=el.dataset.id;
     const n=notes.find(x=>x.id===id);
     if(!n){el.classList.add('hidden-search');return}
-    const text=(n.title||'')+' '+stripHtml(n.content||'');
+    let text=(n.title||'')+' '+(n.checklist?(n.checks||[]).map(c=>c.text).join(' '):stripHtml(n.content||''));
     el.classList.toggle('hidden-search',q&&!text.toLowerCase().includes(q));
   });
 });
-
-function stripHtml(html){const d=document.createElement('div');d.innerHTML=html;return d.textContent||''}
 
 /* ── Clear ── */
 document.getElementById('btnClear').addEventListener('click',()=>{
   if(!notes.length)return;
   if(!confirm('确定清空所有便笺？不可恢复。'))return;
-  notes=[];renderAll();save();
+  snapshot();notes=[];renderAll();save();
 });
 
-/* ── Context Menu Actions ── */
+/* ══════════════════════════════════════════════════
+   Context Menu Actions
+   ══════════════════════════════════════════════════ */
 ctxMenu.querySelectorAll('.ctx-item').forEach(item=>{
   item.addEventListener('click',()=>{
     if(!ctxNoteId)return;
@@ -840,20 +1263,37 @@ ctxMenu.querySelectorAll('.ctx-item').forEach(item=>{
     if(act==='duplicate')duplicateNote(ctxNoteId);
     if(act==='pin'){
       const n=notes.find(x=>x.id===ctxNoteId);
-      if(n){n.pinned=!n.pinned;renderAll();save()}
+      if(n){snapshot();n.pinned=!n.pinned;renderAll();save()}
     }
     if(act==='collapse'){
       const n=notes.find(x=>x.id===ctxNoteId);
-      if(n){n.collapsed=!n.collapsed;
+      if(n){snapshot();n.collapsed=!n.collapsed;renderAll();save()}
+    }
+    if(act==='checklist'){
+      const n=notes.find(x=>x.id===ctxNoteId);
+      if(n){
+        snapshot();n.checklist=!n.checklist;
         const el=canvas.querySelector(`[data-id="${ctxNoteId}"]`);
         if(el){
-          el.classList.toggle('collapsed',n.collapsed);
-          const foldBtn=el.querySelector('.fold-btn');
-          if(foldBtn){
-            foldBtn.innerHTML=n.collapsed
-              ?`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>`
-              :`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>`;
-            foldBtn.title=n.collapsed?'展开':'折叠';
+          el.classList.toggle('checklist-mode',n.checklist);
+          const checkBtn=el.querySelector('.check-btn');
+          if(checkBtn){
+            checkBtn.classList.toggle('active-btn',n.checklist);
+            checkBtn.title=n.checklist?'关闭清单':'清单模式';
+            checkBtn.innerHTML=n.checklist
+              ?`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>`
+              :`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>`;
+          }
+          const bd=el.querySelector('.note-bd');
+          if(n.checklist){
+            const text=stripHtml(n.content||'').trim();
+            const lines=text?text.split('\n').filter(l=>l.trim()):[''];
+            n.checks=lines.map(l=>({text:l.trim(),done:false}));
+            renderChecklist(bd,n);
+          } else {
+            extractChecksFromDom(bd,n);
+            const text=n.checks.map(c=>c.text).join('\n');
+            n.content=text;n.checks=[];bd.innerHTML=text;
           }
         }
         save();
@@ -863,50 +1303,52 @@ ctxMenu.querySelectorAll('.ctx-item').forEach(item=>{
   });
 });
 
-/* ── Global Events ── */
+/* ══════════════════════════════════════════════════
+   Global Events
+   ══════════════════════════════════════════════════ */
+function closeAllPopups(){
+  document.querySelectorAll('.cp-popup.show,.font-popup.show').forEach(p=>p.classList.remove('show'));
+}
 document.addEventListener('click',e=>{
   if(!e.target.closest('.ctx'))ctxMenu.classList.remove('show');
-  if(!e.target.closest('.cp-popup,.cp-btn'))
-    document.querySelectorAll('.cp-popup.show').forEach(p=>p.classList.remove('show'));
+  if(!e.target.closest('.cp-popup,.cp-btn')&&!e.target.closest('.font-popup,.font-btn'))closeAllPopups();
 });
-document.addEventListener('contextmenu',e=>{
-  if(!e.target.closest('.note'))ctxMenu.classList.remove('show');
-});
-/* double-click canvas to create */
-canvas.addEventListener('dblclick',e=>{
-  if(e.target.closest('.note'))return;
-  newNote();
-});
+document.addEventListener('contextmenu',e=>{if(!e.target.closest('.note'))ctxMenu.classList.remove('show')});
+canvas.addEventListener('dblclick',e=>{if(!e.target.closest('.note'))newNote()});
+
+/* ── Global Keyboard ── */
 document.addEventListener('keydown',e=>{
   if((e.ctrlKey||e.metaKey)&&e.key==='n'){e.preventDefault();newNote()}
+  if((e.ctrlKey||e.metaKey)&&e.key==='z'&&!e.target.closest('[contenteditable]')){e.preventDefault();undo()}
+  if((e.ctrlKey||e.metaKey)&&(e.key==='y'||(e.shiftKey&&e.key==='Z'))&&!e.target.closest('[contenteditable]')){e.preventDefault();redo()}
   if(e.key==='Escape'){
-    // close shortcuts panel first
-    if(shortcutsOverlay.classList.contains('show')){
-      shortcutsOverlay.classList.remove('show');return;
-    }
-    // then clear search
-    if(searchInput.value){
-      searchInput.value='';
-      searchInput.dispatchEvent(new Event('input'));
-      searchInput.blur();
-      return;
-    }
-    ctxMenu.classList.remove('show');
-    document.querySelectorAll('.cp-popup.show').forEach(p=>p.classList.remove('show'));
+    if(shortcutsOverlay.classList.contains('show')){shortcutsOverlay.classList.remove('show');return}
+    if(searchInput.value){searchInput.value='';searchInput.dispatchEvent(new Event('input'));searchInput.blur();return}
+    ctxMenu.classList.remove('show');closeAllPopups();
   }
   if((e.key==='?'||e.key==='？')&&!e.target.closest('[contenteditable],input')){
-    e.preventDefault();
-    shortcutsOverlay.classList.toggle('show');
+    e.preventDefault();shortcutsOverlay.classList.toggle('show');
   }
 });
 
-/* ── Buttons ── */
+/* ── Toolbar Buttons ── */
 document.getElementById('btnNew').addEventListener('click',newNote);
 document.getElementById('btnArrange').addEventListener('click',arrange);
 document.getElementById('btnExport').addEventListener('click',exportNotes);
+document.getElementById('btnUndo').addEventListener('click',undo);
+document.getElementById('btnRedo').addEventListener('click',redo);
 
-/* ── Init ── */
+/* ══════════════════════════════════════════════════
+   Init
+   ══════════════════════════════════════════════════ */
 renderAll();
+
+/* ── Electron IPC ── */
+if(window.electronAPI){
+  window.electronAPI.onShortcut(action=>{
+    if(action==='new-note')newNote();
+  });
+}
 </script>
 </body>
 </html>

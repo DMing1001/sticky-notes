@@ -1,6 +1,6 @@
-# 便笺 Sticky Notes
+# 便笺 StickyNotes - 桌面版
 
-单文件 PC 端便笺应用，双击 `index.html` 即可使用。
+基于 [DMing1001/sticky-notes](https://github.com/DMing1001/sticky-notes) 的 Electron 桌面封装。
 
 ## 功能
 
@@ -10,11 +10,36 @@
 - 🔍 搜索便笺（标题 + 正文）
 - 📐 一键网格自动排列
 - 📌 置顶、折叠、复制
-- ⌨️ 快捷键：`Ctrl+N` 新建，`Ctrl+B/I/U` 格式化，`?` 帮助
-- 💾 自动保存到 localStorage
+- ⌨️ 快捷键支持
+- 💾 自动保存
 - 📤 导出 JSON 备份
-- 🖱️ 网格吸附对齐
+- 🔔 **系统托盘常驻** — 关闭窗口不退出
+- ⌨️ **全局快捷键** `Ctrl+Shift+N` 快速新建
 
-## 使用
+## 开发运行
 
-直接用浏览器打开 `index.html` 即可，无需安装任何依赖。
+```bash
+cd sticky-notes-app
+npm install
+npm start
+```
+
+## 打包为 exe 安装包
+
+```bash
+npm run build:win
+```
+
+打包产物在 `dist/` 目录下。
+
+## 文件结构
+
+```
+sticky-notes-app/
+├── main.js          # Electron 主进程
+├── preload.js       # 预加载脚本（IPC 桥接）
+├── index.html       # 便笺应用（来自原项目）
+├── icon.png         # 应用图标
+├── icon.svg         # 图标源文件
+└── package.json     # 项目配置
+```
