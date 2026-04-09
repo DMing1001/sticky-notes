@@ -124,6 +124,31 @@ body{
 .btn svg{width:13px;height:13px;flex-shrink:0}
 .sep{width:1px;height:18px;background:var(--glass-border);margin:0 2px;flex-shrink:0}
 
+/* arrange popup */
+.arrange-popup{
+  position:fixed;
+  background:rgba(20,20,40,.96);backdrop-filter:blur(16px);
+  border:1px solid rgba(255,255,255,.07);border-radius:var(--radius-sm);
+  padding:6px;display:none;flex-direction:column;gap:2px;min-width:200px;
+  box-shadow:0 14px 40px rgba(0,0,0,.6);z-index:99999;
+}
+.arrange-popup.show{display:flex}
+.arrange-opt{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 12px;border-radius:8px;cursor:pointer;
+  transition:all .15s;
+}
+.arrange-opt:hover{background:rgba(255,255,255,.06)}
+.arrange-opt.active{background:var(--accent-glow);border:1px solid rgba(139,92,246,.2)}
+.arrange-opt svg{width:18px;height:18px;color:var(--dim);flex-shrink:0}
+.arrange-opt .opt-title{font-size:12.5px;font-weight:600;color:var(--text)}
+.arrange-opt .opt-desc{font-size:10.5px;color:var(--dim);margin-top:1px}
+body.light .arrange-popup{background:rgba(255,255,255,.96);border-color:rgba(0,0,0,.07);box-shadow:0 10px 32px rgba(0,0,0,.1)}
+body.light .arrange-opt:hover{background:rgba(0,0,0,.04)}
+body.light .arrange-opt.active{background:var(--accent-glow)}
+body.light .arrange-opt .opt-title{color:#333}
+body.light .arrange-opt .opt-desc{color:#888}
+
 /* ═══════════════ Canvas ═══════════════ */
 .canvas{
   position:fixed;top:40px;left:0;right:0;bottom:0;overflow:auto;
@@ -634,6 +659,16 @@ body.light .search-hl{background:rgba(255,180,0,.3)}
   <button class="btn" id="btnArrange" title="自动排列">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
   </button>
+  <div class="arrange-popup" id="arrangePopup">
+    <div class="arrange-opt" data-mode="preserve">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="10" height="7" rx="1.5"/><rect x="15" y="3" width="6" height="7" rx="1.5"/><rect x="3" y="12" width="6" height="9" rx="1.5"/><rect x="11" y="12" width="10" height="9" rx="1.5"/></svg>
+      <div><div class="opt-title">保持当前宽度</div><div class="opt-desc">按现有大小排列</div></div>
+    </div>
+    <div class="arrange-opt" data-mode="standard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="8" height="7" rx="1.5"/><rect x="13" y="3" width="8" height="7" rx="1.5"/><rect x="3" y="14" width="8" height="7" rx="1.5"/><rect x="13" y="14" width="8" height="7" rx="1.5"/></svg>
+      <div><div class="opt-title">统一宽度排列</div><div class="opt-desc">等宽瀑布流</div></div>
+    </div>
+  </div>
   <button class="btn" id="btnTheme" title="切换主题">
     <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
   </button>
@@ -721,6 +756,7 @@ notes=notes.map(n=>({...n,color:colorMap[n.color]||n.color,fontSize:n.fontSize||
 
 let maxZ=notes.reduce((m,n)=>Math.max(m,n.z||10),10);
 let ctxNoteId=null;
+let arrangeMode=localStorage.getItem('sticky-arrange-mode')||'preserve';
 
 // Global undo stack (note-level changes)
 const undoStack=[];
@@ -1186,7 +1222,6 @@ function buildNote(n){
         if(node && node.nodeType===3){
           const text=node.textContent;
           const before=text.slice(0,sel.anchorOffset);
-          // Detect patterns at start of current line
           const lineStart=before.lastIndexOf('\n')+1;
           const line=before.slice(lineStart);
           const patterns=[
@@ -1200,79 +1235,110 @@ function buildNote(n){
           for(const p of patterns){
             const m=line.match(p.re);
             if(m){
-              e.preventDefault();
-              snapshot();
-              // Remove the markdown syntax from current position
+              e.preventDefault();snapshot();
               const newBefore=before.slice(0,lineStart);
               node.textContent=newBefore+text.slice(sel.anchorOffset);
-              // Insert line break
               document.execCommand('insertLineBreak');
-              n.content=bd.innerHTML;
-              save();
-              return;
+              n.content=bd.innerHTML;save();return;
             }
           }
         }
       }
     }
 
-    // checklist: Enter to add new item, Backspace on empty to remove
-    if(n.checklist){
-      if(e.key==='Enter'&&!e.shiftKey){
-        e.preventDefault();
-        const sel=window.getSelection();
-        if(!sel.rangeCount)return;
-        const curItem=findCheckItem(sel.anchorNode);
-        if(curItem){
-          snapshot();
-          const textEl=curItem.querySelector('.check-text');
-          // split text at cursor
-          const range=sel.getRangeAt(0);
-          const beforeRange=document.createRange();
-          beforeRange.setStart(textEl,0);
-          beforeRange.setEnd(range.startContainer,range.startOffset);
-          const afterRange=document.createRange();
-          afterRange.setStart(range.endContainer,range.endOffset);
-          afterRange.setEnd(textEl,textEl.childNodes.length);
-          // create new item
-          const newDiv=document.createElement('div');
-          newDiv.className='check-item';
-          newDiv.innerHTML=`<div class="check-box"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="check-text" contenteditable="true"></div>`;
-          curItem.after(newDiv);
-          // focus new text
-          const newtext=newDiv.querySelector('.check-text');
-          newtext.focus();
-          // save
-          extractChecksFromDom(bd,n);
-          save();
-        }
+    // ── Checklist: Enter / Backspace ──
+    if(!n.checklist)return;
+
+    /* helper: walk up from node to find .check-item */
+    function findCI(node){
+      let p=node;
+      while(p){
+        if(p.classList&&p.classList.contains('check-item'))return p;
+        if(p===bd)return null;
+        p=p.parentElement;
       }
-      if(e.key==='Backspace'){
-        const sel=window.getSelection();
-        if(!sel.rangeCount)return;
-        const curItem=findCheckItem(sel.anchorNode);
-        if(curItem){
-          const textEl=curItem.querySelector('.check-text');
-          if(textEl&&(textEl.textContent===''||textEl.textContent==='\n')){
-            e.preventDefault();
-            snapshot();
-            const prev=curItem.previousElementSibling;
-            curItem.remove();
-            if(prev&&prev.classList.contains('check-item')){
-              const pt=prev.querySelector('.check-text');
-              pt.focus();
-              // move cursor to end
-              const range=document.createRange();
-              range.selectNodeContents(pt);
-              range.collapse(false);
-              sel.removeAllRanges();
-              sel.addRange(range);
-            }
-            extractChecksFromDom(bd,n);
-            save();
-          }
-        }
+      return null;
+    }
+
+    /* helper: split text at cursor, return {before, after} */
+    function splitAtCursor(textEl){
+      const sel=window.getSelection();
+      if(!sel.rangeCount)return{text:textEl.textContent||'',after:''};
+      try{
+        const r=sel.getRangeAt(0);
+        const bR=document.createRange();
+        bR.setStart(textEl,0);
+        bR.setEnd(r.startContainer,r.startOffset);
+        const aR=document.createRange();
+        aR.setStart(r.endContainer,r.endOffset);
+        aR.setEnd(textEl,textEl.childNodes.length);
+        return{before:bR.toString(),after:aR.toString()};
+      }catch(ex){
+        return{before:textEl.textContent||'',after:''};
       }
+    }
+
+    if(e.key==='Enter'&&!e.shiftKey){
+      e.preventDefault();
+      const curItem=findCI(window.getSelection().anchorNode);
+      if(!curItem)return;
+      const textEl=curItem.querySelector('.check-text');
+      if(!textEl)return;
+      const{before,after}=splitAtCursor(textEl);
+
+      /* sync DOM → data model, then update */
+      extractChecksFromDom(bd,n);
+      const domItems=[...bd.querySelectorAll('.check-item')];
+      const idx=domItems.indexOf(curItem);
+      if(idx<0)return;
+
+      snapshot();
+      n.checks[idx]={text:before.trim(),done:n.checks[idx]?.done||false};
+      if(before.trim()||after.trim()){
+        n.checks.splice(idx+1,0,{text:after.trim(),done:false});
+      }
+      renderChecklist(bd,n);
+      save();
+
+      const focusIdx=idx+1;
+      setTimeout(()=>{
+        const items=bd.querySelectorAll('.check-item');
+        if(items[focusIdx]){
+          const ct=items[focusIdx].querySelector('.check-text');
+          if(ct)ct.focus();
+        }
+      },10);
+      return;
+    }
+
+    if(e.key==='Backspace'){
+      const sel=window.getSelection();
+      if(!sel.rangeCount)return;
+      const curItem=findCI(sel.anchorNode);
+      if(!curItem)return;
+      const textEl=curItem.querySelector('.check-text');
+      if(!textEl||textEl.textContent!=='')return;
+
+      e.preventDefault();
+      extractChecksFromDom(bd,n);
+      const domItems=[...bd.querySelectorAll('.check-item')];
+      const idx=domItems.indexOf(curItem);
+      if(idx<0||n.checks.length<=1)return;
+
+      snapshot();
+      const focusIdx=Math.max(0,idx-1);
+      n.checks.splice(idx,1);
+      renderChecklist(bd,n);
+      save();
+
+      setTimeout(()=>{
+        const items=bd.querySelectorAll('.check-item');
+        if(items[focusIdx]){
+          const ct=items[focusIdx].querySelector('.check-text');
+          if(ct)ct.focus();
+        }
+      },10);
+      return;
     }
   });
 
@@ -1489,14 +1555,6 @@ function extractChecksFromDom(bd,n){
   }
 }
 
-function findCheckItem(node){
-  while(node&&!node.classList?.contains('check-item')){
-    node=node.parentElement;
-    if(!node||node.classList?.contains('note-bd'))return null;
-  }
-  return node;
-}
-
 /* ══════════════════════════════════════════════════
    CRUD
    ══════════════════════════════════════════════════ */
@@ -1539,40 +1597,79 @@ function newNote(){
   setTimeout(()=>{const e=canvas.querySelector(`[data-id="${id}"] .note-bd`);if(e)e.focus()},50);
 }
 
-/* ── Auto Arrange (Masonry) ── */
-function arrange(){
+/* ── Arrange Mode ── */
+function arrange(mode){
   if(!notes.length)return;
+  if(mode)arrangeMode=mode;
+  localStorage.setItem('sticky-arrange-mode',arrangeMode);
+  // update popup highlight
+  document.querySelectorAll('.arrange-opt').forEach(b=>{
+    b.classList.toggle('active',b.dataset.mode===arrangeMode);
+  });
   snapshot();
   const pad=16,gap=14;
   const cw=canvas.clientWidth-pad*2;
-  const minColW=260;
-  const cols=Math.max(1,Math.floor((cw+gap)/(minColW+gap)));
-  const colW=(cw-(cols-1)*gap)/cols;
   const hiddenIds=new Set();
   canvas.querySelectorAll('.note.hidden-search').forEach(el=>hiddenIds.add(el.dataset.id));
   const sorted=[...notes].filter(n=>!hiddenIds.has(n.id)).sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0)||(a.created||0)-(b.created||0));
-  // Track actual height of each column (masonry layout)
-  const colHeights=new Array(cols).fill(pad);
-  sorted.forEach(n=>{
-    // Find shortest column
-    let minCol=0;
-    for(let c=1;c<cols;c++){if(colHeights[c]<colHeights[minCol])minCol=c}
-    // Position note in shortest column
-    n.x=pad+minCol*(colW+gap);
-    n.y=colHeights[minCol];
-    // Update column height
-    const noteH=n.h||200;
-    colHeights[minCol]+=noteH+gap;
-    // Apply width
-    n.w=Math.round(colW);
-    // Animate
-    const el=canvas.querySelector(`[data-id="${n.id}"]`);
-    if(el){
-      el.style.transition='left .35s ease,top .35s ease,width .35s ease';
-      el.style.left=n.x+'px';el.style.top=n.y+'px';el.style.width=n.w+'px';
-      setTimeout(()=>el.style.transition='',400);
-    }
-  });
+
+  if(arrangeMode==='standard'){
+    // Standard: fixed column width, masonry
+    const minColW=260;
+    const cols=Math.max(1,Math.floor((cw+gap)/(minColW+gap)));
+    const colW=(cw-(cols-1)*gap)/cols;
+    const colHeights=new Array(cols).fill(pad);
+    sorted.forEach(n=>{
+      let minCol=0;
+      for(let c=1;c<cols;c++){if(colHeights[c]<colHeights[minCol])minCol=c}
+      n.x=pad+minCol*(colW+gap);
+      n.y=colHeights[minCol];
+      const noteH=n.h||200;
+      colHeights[minCol]+=noteH+gap;
+      n.w=Math.round(colW);
+      const el=canvas.querySelector(`[data-id="${n.id}"]`);
+      if(el){
+        el.style.transition='left .35s ease,top .35s ease,width .35s ease';
+        el.style.left=n.x+'px';el.style.top=n.y+'px';el.style.width=n.w+'px';
+        setTimeout(()=>el.style.transition='',400);
+      }
+    });
+  } else {
+    // Preserve: keep each note's own width, masonry with variable widths
+    // Group notes into columns based on their current width
+    const colHeights=[];
+    const colXs=[];
+    sorted.forEach(n=>{
+      const noteW=n.w||280;
+      // find a column that matches this width (within 20px tolerance) and is shortest
+      let bestCol=-1;
+      for(let c=0;c<colXs.length;c++){
+        if(Math.abs(colXs[c].w-noteW)<20){
+          if(bestCol<0||colHeights[c]<colHeights[bestCol])bestCol=c;
+        }
+      }
+      if(bestCol<0){
+        // new column
+        bestCol=colXs.length;
+        // position: after last column
+        let xPos=pad;
+        for(let c=0;c<colXs.length;c++){
+          xPos=Math.max(xPos,colXs[c].x+colXs[c].w+gap);
+        }
+        colXs.push({x:xPos,w:noteW});
+        colHeights.push(pad);
+      }
+      n.x=colXs[bestCol].x;
+      n.y=colHeights[bestCol];
+      colHeights[bestCol]+=(n.h||200)+gap;
+      const el=canvas.querySelector(`[data-id="${n.id}"]`);
+      if(el){
+        el.style.transition='left .35s ease,top .35s ease';
+        el.style.left=n.x+'px';el.style.top=n.y+'px';
+        setTimeout(()=>el.style.transition='',400);
+      }
+    });
+  }
   save();
 }
 
@@ -1661,11 +1758,11 @@ ctxMenu.querySelectorAll('.ctx-item').forEach(item=>{
    Global Events
    ══════════════════════════════════════════════════ */
 function closeAllPopups(){
-  document.querySelectorAll('.cp-popup.show,.font-popup.show').forEach(p=>p.classList.remove('show'));
+  document.querySelectorAll('.cp-popup.show,.font-popup.show,.arrange-popup.show').forEach(p=>p.classList.remove('show'));
 }
 document.addEventListener('click',e=>{
   if(!e.target.closest('.ctx'))ctxMenu.classList.remove('show');
-  if(!e.target.closest('.cp-popup,.cp-btn')&&!e.target.closest('.font-popup,.font-btn'))closeAllPopups();
+  if(!e.target.closest('.cp-popup,.cp-btn')&&!e.target.closest('.font-popup,.font-btn')&&!e.target.closest('.arrange-popup,.btn'))closeAllPopups();
 });
 document.addEventListener('contextmenu',e=>{if(!e.target.closest('.note'))ctxMenu.classList.remove('show')});
 canvas.addEventListener('dblclick',e=>{if(!e.target.closest('.note'))newNote()});
@@ -1688,7 +1785,31 @@ document.addEventListener('keydown',e=>{
 
 /* ── Toolbar Buttons ── */
 document.getElementById('btnNew').addEventListener('click',newNote);
-document.getElementById('btnArrange').addEventListener('click',arrange);
+
+// Arrange popup
+const arrangePopup=document.getElementById('arrangePopup');
+document.getElementById('btnArrange').addEventListener('click',e=>{
+  e.stopPropagation();
+  closeAllPopups();
+  arrangePopup.classList.toggle('show');
+  // position below the button
+  const btn=document.getElementById('btnArrange');
+  const r=btn.getBoundingClientRect();
+  arrangePopup.style.left=r.left+'px';
+  arrangePopup.style.top=(r.bottom+4)+'px';
+});
+arrangePopup.querySelectorAll('.arrange-opt').forEach(opt=>{
+  opt.addEventListener('click',e=>{
+    e.stopPropagation();
+    arrange(opt.dataset.mode);
+    arrangePopup.classList.remove('show');
+  });
+});
+// init active state
+arrangePopup.querySelectorAll('.arrange-opt').forEach(b=>{
+  b.classList.toggle('active',b.dataset.mode===arrangeMode);
+});
+
 document.getElementById('btnExport').addEventListener('click',exportNotes);
 document.getElementById('btnUndo').addEventListener('click',undo);
 document.getElementById('btnRedo').addEventListener('click',redo);

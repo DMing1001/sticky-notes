@@ -37,3 +37,28 @@
 ### 注意事项
 - 用户分享过 GitHub token，已提醒每次用完撤销
 - electron-builder 打包时不要自动发布（用 --publish never），Release 由 softprops/action-gh-release 处理
+
+## Bug 修复记录 (2026-04-09)
+
+### Bug 1: 清单模式回车不正常
+**现象**: 在清单模式下按回车，新行出现了但无法在新行打字，光标无法正确跳到新行。在文字中间回车正常，但末尾回车有问题。
+**根因**: 
+- 原实现直接操作 DOM text node（Range 拆分 + 手动创建元素 + focus），浏览器在 contenteditable 环境下的内部选择状态管理与手动 DOM 操作冲突
+- `findCheckItem` 函数在 `note-bd` 处提前返回 null，某些光标位置找不到 check-item
+- 尝试加 `mousedown` handler 强制 focus，反而阻止了浏览器默认光标放置（mousedown 阶段的 focus 会干扰 contenteditable）
+**修复方案**: 
+- 完全重写清单 keydown handler
+- Enter/Backspace 改为"修改数据模型 → renderChecklist 重新渲染 → setTimeout focus 新项"路线
+- 删掉全局 `findCheckItem`，换成 keydown 内部的 `findCI`（遍历到 document 为止）
+- 删掉所有 `mousedown` handler，让浏览器自然处理光标
+- 删掉直接 DOM text node 操作，避免与浏览器 selection 管理冲突
+
+### Bug 2: 排列后便笺宽度重置
+**现象**: 点排列后所有便笺宽度变回默认 280px，用户自定义的宽度丢失。
+**根因**: `arrange()` 里无条件执行 `n.w = Math.round(colW)` 覆盖宽度。
+**修复方案**:
+- 排列按钮改为弹出选择菜单，两种模式：
+  - "保持当前宽度"（默认）— 按便笺各自宽度做瀑布流排列
+  - "统一宽度排列" — 原来的等宽 Masonry 布局
+- 记忆选择到 localStorage
+- 保持宽度模式：相同宽度的便笺归入同一列，不同宽度各自成列
